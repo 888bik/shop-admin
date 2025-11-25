@@ -45,7 +45,7 @@
           round
           color="#6366f1"
           class="w-[250px]"
-          @click="onSubmit(formRef)"
+          @click="onSubmit()"
           :loading="isLoading"
           >登录</el-button
         >
@@ -88,10 +88,10 @@ const rules = reactive<FormRules<RuleForm>>({
   ],
 });
 
-const onSubmit = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
+const onSubmit = async () => {
+  if (!formRef.value) return;
   try {
-    const valid = await formEl.validate();
+    const valid = await formRef.value.validate();
 
     if (!valid) return;
 
@@ -121,8 +121,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     isLoading.value = false;
   }
 };
-
-
 </script>
 
 <style scoped>

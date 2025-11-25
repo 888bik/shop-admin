@@ -28,3 +28,25 @@ export function getAdminInfo() {
       console.log("请求失败", err);
     });
 }
+
+export function updatePassword(
+  oldpassword: string,
+  password: string,
+  repassword: string
+) {
+  return userRequest
+    .request({
+      url: "admin/updatepassword",
+      method: "post",
+      data: {
+        oldpassword,
+        password,
+        repassword,
+      },
+    })
+    .then((res) => {})
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+}

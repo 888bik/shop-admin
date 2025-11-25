@@ -5,25 +5,27 @@ import {
   type RouteRecordRaw,
 } from "vue-router";
 
-import Home from "@/pages/Home.vue";
-import NotFound from "@/pages/404.vue";
-import Login from "@/pages/Login.vue";
+import NotFound from "@/pages/notFound/404.vue";
+import DefaultLayout from "@/layout/DefaultLayout.vue";
 
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
     redirect: "/home",
-  },
-  {
-    path: "/home",
-    component: Home,
-    meta: {
-      title: "后台首页-鲜花商城管理系统",
-    },
+    component: DefaultLayout,
+    children: [
+      {
+        path: "/home",
+        component: () => import("@/pages/home/home.vue"),
+        meta: {
+          title: "后台首页-鲜花商城管理系统",
+        },
+      },
+    ],
   },
   {
     path: "/login",
-    component: Login,
+    component: () => import("@/pages/login/login.vue"),
     meta: {
       title: "登录页-鲜花商城管理系统",
     },

@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts"></script>
+
 <style>
 #nprogress .bar {
   background-color: #f4f4f4 !important;
