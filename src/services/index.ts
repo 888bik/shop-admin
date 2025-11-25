@@ -1,0 +1,7 @@
+import { BASE_URL, TIMEOUT } from "./config";
+import MyRequest from "./request";
+
+export const userRequest = new MyRequest({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT,
+});
