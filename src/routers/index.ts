@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
         path: "/home",
         component: () => import("@/pages/home/home.vue"),
         meta: {
-          title: "后台首页-鲜花商城管理系统",
+          title: "后台首页",
         },
       },
     ],
@@ -28,7 +28,7 @@ const routes: RouteRecordRaw[] = [
     path: "/login",
     component: () => import("@/pages/login/login.vue"),
     meta: {
-      title: "登录页-鲜花商城管理系统",
+      title: "登录页",
     },
   },
   // 将匹配所有内容并将其放在 `route.params.pathMatch` 下

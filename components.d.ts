@@ -13,6 +13,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppAside: typeof import('./src/components/app-aside.vue')['default']
     AppHeader: typeof import('./src/components/app-header.vue')['default']
+    AppTaglist: typeof import('./src/components/app-taglist.vue')['default']
+    AppTagList: typeof import('./src/components/app-tagList.vue')['default']
     Aside: typeof import('./src/components/aside.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
@@ -38,6 +40,8 @@ declare module 'vue' {
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSubItem: typeof import('element-plus/es')['ElSubItem']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
+    ElTabPane: typeof import('element-plus/es')['ElTabPane']
+    ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     FormDarwer: typeof import('./src/components/formDarwer.vue')['default']
     FormDrawer: typeof import('./src/components/formDrawer.vue')['default']

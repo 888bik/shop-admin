@@ -16,7 +16,6 @@ function getComponentByPath(componentPath: string) {
     // 回退到 404 组件或空壳
     return () => import("@/pages/notFound/404.vue");
   }
-  console.log(mod);
   return mod;
 }
 

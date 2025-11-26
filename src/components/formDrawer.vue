@@ -4,6 +4,8 @@
     :size="size"
     :destroy-on-close="destroyOnClose"
     :close-on-click-modal="closeOnClickModal"
+    :teleported="true"
+    append-to-body
   >
     <div class="formDrawer">
       <div class="body">

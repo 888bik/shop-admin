@@ -63,7 +63,6 @@ const isCollapse = computed(() => {
 });
 
 const defaultActive = ref(route.path);
-console.log(defaultActive.value);
 
 const defaultOpeneds = ref<string[]>([]);
 
