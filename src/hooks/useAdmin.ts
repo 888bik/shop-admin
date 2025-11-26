@@ -1,4 +1,4 @@
-import { updatePassword } from "@/services/modules/admin";
+import { updatePassword } from "@/services/modules/user";
 import { toast } from "@/utils/toast";
 import type { FormInstance, FormRules } from "element-plus";
 import { reactive, ref } from "vue";

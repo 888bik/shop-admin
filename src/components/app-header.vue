@@ -9,15 +9,15 @@
       >
 
       <span class="icon-btn-left mx-10">
-        <el-tooltip effect="dark" content="收缩">
-          <el-icon class="icon-btn">
+        <el-tooltip effect="dark" content="折叠">
+          <el-icon class="icon-btn" @click="handleAsideFold">
             <fold />
           </el-icon>
         </el-tooltip>
 
         <el-tooltip effect="dark" content="刷新">
-          <el-icon class="icon-btn mx-4">
-            <refresh @click="HandleRefresh" />
+          <el-icon class="icon-btn mx-4" @click="handleRefresh">
+            <refresh />
           </el-icon>
         </el-tooltip>
       </span>
@@ -101,10 +101,13 @@ import { removeToken } from "@/utils/auth";
 import { UseEdPassword } from "@/hooks/useAdmin";
 import FormDrawer from "./formDrawer.vue";
 import { useFullscreen } from "@vueuse/core";
+import useUserStore from "@/store/modules/user";
 
 const { rules, formRef, showDrawer, onSubmit, form } = UseEdPassword();
 
 const { isFullscreen, toggle } = useFullscreen();
+
+const userStore = useUserStore();
 
 const handleCommand = (e: any) => {
   switch (e) {
@@ -125,8 +128,12 @@ function logout() {
   router.replace("/login");
 }
 
-function HandleRefresh() {
+function handleRefresh() {
   location.reload();
+}
+
+function handleAsideFold() {
+  userStore.asideWidth = userStore.asideWidth == "250px" ? "64px" : "250px";
 }
 </script>
 

@@ -21,6 +21,14 @@ const routes: RouteRecordRaw[] = [
           title: "后台首页-鲜花商城管理系统",
         },
       },
+      {
+        path: "/goods/list",
+        component: () => import("@/pages/goods/list.vue"),
+      },
+      {
+        path: "/category/list",
+        component: () => import("@/pages/category/list.vue"),
+      },
     ],
   },
   {

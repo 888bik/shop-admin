@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { adminLogin, getAdminInfo } from "@/services/modules/admin";
+import { userLogin, getUserInfo } from "@/services/modules/user";
 import { type FormInstance, type FormRules } from "element-plus";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -97,7 +97,7 @@ const onSubmit = async () => {
 
     isLoading.value = true;
 
-    const token = await adminLogin(form.username, form.password);
+    const token = await userLogin(form.username, form.password);
 
     isLoading.value = false;
 
@@ -109,8 +109,7 @@ const onSubmit = async () => {
       toast("登录成功", "欢迎回来");
 
       //获取管理员信息
-      const res = await getAdminInfo();
-      userStore.user = res;
+      userStore.fetchUserInfo();
 
       //登录成功跳转
       router.push("/home");

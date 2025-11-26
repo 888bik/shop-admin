@@ -1,6 +1,6 @@
 import { userRequest } from "..";
 
-export function adminLogin(username: string, password: string) {
+export function userLogin(username: string, password: string) {
   return userRequest
     .request({
       url: "admin/login",
@@ -15,7 +15,7 @@ export function adminLogin(username: string, password: string) {
     });
 }
 
-export function getAdminInfo() {
+export function getUserInfo() {
   return userRequest
     .request({
       url: "admin/getinfo",
