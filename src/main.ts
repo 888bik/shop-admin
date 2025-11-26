@@ -10,10 +10,9 @@ import "element-plus/theme-chalk/el-notification.css";
 import pinia from "./store";
 import "@/utils/permission";
 import "nprogress/nprogress.css";
-
+import "@/utils/route.utils";
 
 const app = createApp(App);
-
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);

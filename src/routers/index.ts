@@ -13,6 +13,7 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     redirect: "/home",
     component: DefaultLayout,
+    name: "Layout",
     children: [
       {
         path: "/home",
@@ -20,14 +21,6 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: "后台首页-鲜花商城管理系统",
         },
-      },
-      {
-        path: "/goods/list",
-        component: () => import("@/pages/goods/list.vue"),
-      },
-      {
-        path: "/category/list",
-        component: () => import("@/pages/category/list.vue"),
       },
     ],
   },

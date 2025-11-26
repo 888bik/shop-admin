@@ -1,6 +1,6 @@
 import { getUserInfo } from "@/services/modules/user";
 import { defineStore } from "pinia";
-interface MenuItem {
+export interface MenuItem {
   id: number;
   ruleId: number;
   status: number;
@@ -22,6 +22,7 @@ const useUserStore = defineStore("user", {
       user: {},
       menus: [] as MenuItem[],
       asideWidth: "250px",
+      hasRoutes: false,
     };
   },
   actions: {

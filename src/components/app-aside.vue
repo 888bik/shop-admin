@@ -85,8 +85,8 @@ watch(
  * @param e 二级菜单中index的值，在只有一级菜单时，e为一级菜单index的值
  */
 function handleSelect(e: any) {
-  console.log(e);
-  router.push(e);
+  const path = e === "/" ? "/home" : e;
+  router.push(path);
 }
 </script>
 

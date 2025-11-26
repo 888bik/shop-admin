@@ -3,8 +3,10 @@ import { getToken } from "./auth";
 import type { NavigationGuardNext } from "vue-router";
 import { toast } from "./toast";
 import { hideFullLoading, showFullLoading } from "./loadingBar";
+import { addDynamicRoutes } from "./route.utils";
+import useUserStore from "@/store/modules/user";
 
-router.beforeEach((to, from, next: NavigationGuardNext) => {
+router.beforeEach(async (to, from, next: NavigationGuardNext) => {
   showFullLoading();
 
   //登录判断逻辑:
@@ -23,10 +25,19 @@ router.beforeEach((to, from, next: NavigationGuardNext) => {
     return next({ path: from.path });
   }
 
-  let title = to.meta.title as string;
-  if (title) {
-    document.title = title;
+  const userStore = useUserStore();
+
+  if (token && !userStore.hasRoutes) {
+    if (userStore.menus.length === 0) {
+      await userStore.fetchUserInfo();
+    }
+    addDynamicRoutes(userStore.menus);
+    userStore.hasRoutes = true;
+    return next({ path: to.path, replace: true });
   }
+
+  //动态设置页面标题
+  document.title = `${to.meta.title}-鲜花商城管理系统` || document.title;
 
   next();
 });

@@ -62,6 +62,7 @@ import { useRouter } from "vue-router";
 import { toast } from "@/utils/toast";
 import useUserStore from "@/store/modules/user";
 import { setToken } from "@/utils/auth";
+import { addDynamicRoutes } from "@/utils/route.utils";
 
 interface RuleForm {
   username: string;
@@ -109,7 +110,7 @@ const onSubmit = async () => {
       toast("登录成功", "欢迎回来");
 
       //获取管理员信息
-      userStore.fetchUserInfo();
+      await userStore.fetchUserInfo();
 
       //登录成功跳转
       router.push("/home");
