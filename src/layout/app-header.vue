@@ -99,7 +99,7 @@ import { toast } from "@/utils/toast";
 import router from "@/routers";
 import { removeToken } from "@/utils/auth";
 import { UseEdPassword } from "@/hooks/useAdmin";
-import FormDrawer from "./formDrawer.vue";
+import FormDrawer from "../components/formDrawer.vue";
 import { useFullscreen } from "@vueuse/core";
 import useUserStore from "@/store/modules/user";
 
@@ -141,6 +141,7 @@ function handleAsideFold() {
 .app-header {
   @apply flex items-center justify-between bg-indigo-700 text-light-50 fixed top-0 left-0 right-0;
   height: 64px;
+  z-index: 999;
 }
 .left {
   @apply flex justify-center items-center;

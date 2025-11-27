@@ -55,14 +55,13 @@
 </template>
 
 <script setup lang="ts">
-import { userLogin, getUserInfo } from "@/services/modules/user";
+import { userLogin } from "@/services/modules/user";
 import { type FormInstance, type FormRules } from "element-plus";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { toast } from "@/utils/toast";
 import useUserStore from "@/store/modules/user";
 import { setToken } from "@/utils/auth";
-import { addDynamicRoutes } from "@/utils/route.utils";
 
 interface RuleForm {
   username: string;

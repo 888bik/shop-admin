@@ -10,18 +10,20 @@
         </el-aside>
         <el-main>
           <AppTagList></AppTagList>
-          <transition name="page-fade-slide" mode="out-in">
-            <router-view></router-view>
-          </transition>
+          <router-view v-slot="{ Component }">
+            <transition name="page-fade-slide" mode="out-in">
+              <component :is="Component"></component>
+            </transition>
+          </router-view>
         </el-main>
       </el-container>
     </el-container>
   </div>
 </template>
 <script setup lang="ts">
-import AppAside from "@/components/app-aside.vue";
-import AppHeader from "@/components/app-header.vue";
-import AppTagList from "@/components/app-taglist.vue";
+import AppAside from "@/layout/app-aside.vue";
+import AppHeader from "@/layout/app-header.vue";
+import AppTagList from "@/layout/app-taglist.vue";
 
 import useUserStore from "@/store/modules/user";
 

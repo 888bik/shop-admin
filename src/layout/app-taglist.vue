@@ -119,14 +119,15 @@ initTabsData();
 
 const handleClose = (e: any) => {
   if (e === "clearAll") {
-    //只保留当前tab
-    activeTab.value = "/";
+    //只保留首页
+    activeTab.value = "/home";
     tabList.value = [
       {
         title: "后台首页",
-        path: "home",
+        path: "/home",
       },
     ];
+    router.push("/home");
   } else if (e === "clearOther") {
     //过滤掉只剩当前激活的tab和后台首页
     tabList.value = tabList.value.filter(
