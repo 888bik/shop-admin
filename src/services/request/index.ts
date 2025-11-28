@@ -2,7 +2,7 @@ import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 import type { MyRequestConfig } from "./type";
 import Cookies from "js-cookie";
-import { toast } from "@/utils/toast";
+import { toast } from "@/assets/base-ui/toast";
 import { getToken } from "@/utils/auth";
 
 class MyRequest {
@@ -22,7 +22,7 @@ class MyRequest {
         return config;
       },
       (err) => {
-        return err;
+        throw err;
       }
     );
     //响应拦截器
@@ -32,8 +32,9 @@ class MyRequest {
       },
       (err) => {
         //提示失败
-        toast("登录失败", "请检查账号或密码是否正确", "error");
-        return err;
+        //ToDo
+        // toast("登录失败", "请检查账号或密码是否正确", "error");
+        throw err;
       }
     );
 

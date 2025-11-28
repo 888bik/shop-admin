@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, type Directive } from "vue";
 import App from "./App.vue";
 import "virtual:windi.css";
 import router from "./routers";
@@ -14,8 +14,10 @@ import "@/utils/route.utils";
 
 const app = createApp(App);
 
+import permission from "./directives/permission";
+
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }
 
-app.use(router).use(pinia).mount("#app");
+app.use(router).use(pinia).use(permission).mount("#app");

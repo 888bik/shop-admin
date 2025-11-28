@@ -72,7 +72,7 @@ onBeforeRouteUpdate((to, from) => {
  *
  * @param e 路径
  */
-const changeTab = (e: any) => {
+const changeTab = (e: string) => {
   activeTab.value = e;
   router.push(e);
 };

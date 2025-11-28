@@ -22,7 +22,7 @@
 <script setup lang="ts">
 interface FormDrawerProps {
   title: string;
-  size: string;
+  size?: string;
   confirmText?: string;
   destroyOnClose?: boolean;
   closeOnClickModal?: boolean;

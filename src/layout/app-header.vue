@@ -58,7 +58,7 @@
       ref="formDrawRef"
       v-model="showDrawer"
       @submit="onSubmit"
-      @close="onClose"
+      @close="showDrawer = false"
     >
       <el-form
         ref="formRef"
@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { toast } from "@/utils/toast";
+import { toast } from "@/assets/base-ui/toast";
 import router from "@/routers";
 import { removeToken } from "@/utils/auth";
 import { UseEdPassword } from "@/hooks/useAdmin";
@@ -119,8 +119,6 @@ const handleCommand = (e: any) => {
       break;
   }
 };
-
-const onClose = () => (showDrawer.value = false);
 
 function logout() {
   removeToken();

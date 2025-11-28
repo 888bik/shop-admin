@@ -1,0 +1,136 @@
+<template>
+  <el-aside width="200px" class="relative" v-loading="isLoading">
+    <div class="image-category">
+      <div
+        v-for="(item, index) in imageCategoryData"
+        :key="item.id"
+        class="category-list"
+        :class="{ active: activeId === item.id }"
+        @click="handleSelected(item.id)"
+      >
+        <span class="truncate">
+          {{ item.name }}
+        </span>
+        <div class="btn-group">
+          <el-button
+            class="editBtn"
+            text
+            type="primary"
+            size="small"
+            @click.stop="$emit('edit', item)"
+          >
+            <el-icon :size="12"><Edit /></el-icon>
+          </el-button>
+          <el-button
+            text
+            class="deleteBtn"
+            type="primary"
+            size="small"
+            @click.stop="$emit('delete', item.id)"
+          >
+            <el-icon :size="12"><Close /></el-icon>
+          </el-button>
+        </div>
+      </div>
+    </div>
+    <div class="bottom">
+      <el-pagination
+        background
+        layout="prev, next"
+        :total="totalCount"
+        :page-size="limit"
+        :current-page="currentPage"
+        @current-change="handlePageChange"
+      />
+    </div>
+  </el-aside>
+</template>
+
+<script setup lang="ts">
+import { getImageCategory } from "@/services/modules/image";
+import { ref } from "vue";
+import type { ICategoryItem, IImageCategory, IImageList } from "../type";
+
+const imageCategoryData = ref<ICategoryItem[]>([]);
+
+const currentPage = ref(1);
+const totalCount = ref(0);
+const limit = ref(10);
+
+const isLoading = ref(false);
+
+const activeId = ref<number>(0);
+
+const emit = defineEmits<{
+  (e: "change", id: number): void;
+  (e: "edit", data: ICategoryItem): void;
+  (e: "delete", id: number): void;
+}>();
+const handlePageChange = async (page: number) => {
+  loadData(page);
+};
+
+const handleSelected = (id: number) => {
+  activeId.value = id;
+  emit("change", id);
+};
+
+const loadData = async (page = currentPage.value) => {
+  isLoading.value = true;
+  try {
+    const res: IImageCategory = await getImageCategory(page, limit.value);
+
+    imageCategoryData.value = res.list;
+    totalCount.value = res.totalCount;
+    currentPage.value = page;
+
+    if (activeId.value === 0 && res.list.length > 0) {
+      activeId.value = res.list[0]!.id;
+      emit("change", activeId.value);
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+loadData();
+
+defineExpose({
+  loadData,
+});
+</script>
+
+<style scoped>
+.image-category {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 50px;
+  overflow-y: auto;
+}
+.bottom {
+  position: absolute;
+  bottom: 0;
+  height: 50px;
+  left: 0;
+  right: 0;
+  @apply flex items-center justify-center;
+}
+.category-list {
+  border-bottom: 1px solid #f4f4f4;
+  cursor: pointer;
+  @apply flex items-center justify-between px-3 py-3;
+}
+.category-list:hover {
+  @apply bg-blue-50;
+}
+.active {
+  @apply bg-blue-50;
+}
+.category-list .editBtn {
+  @apply px-1;
+}
+.category-list .deleteBtn {
+  @apply px-1;
+}
+</style>

@@ -1,21 +1,7 @@
 import { getUserInfo } from "@/services/modules/user";
 import { defineStore } from "pinia";
-export interface MenuItem {
-  id: number;
-  ruleId: number;
-  status: number;
-  createTime: string;
-  updateTime: string;
-  name: string;
-  desc: string;
-  frontpath: any;
-  condition: any;
-  menu: number;
-  order: number;
-  icon: string;
-  method: string;
-  child?: MenuItem[];
-}
+import type { MenuItem } from "../type";
+
 const useUserStore = defineStore("user", {
   state: () => {
     return {
@@ -23,6 +9,7 @@ const useUserStore = defineStore("user", {
       menus: [] as MenuItem[],
       asideWidth: "250px",
       hasRoutes: false,
+      ruleNames: [],
     };
   },
   actions: {
@@ -30,6 +17,7 @@ const useUserStore = defineStore("user", {
       const res = await getUserInfo();
       this.user = res;
       this.menus = res.menus;
+      this.ruleNames = res.ruleNames;
     },
   },
   //开启持久化

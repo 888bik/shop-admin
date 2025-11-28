@@ -1,8 +1,8 @@
 import router from "@/routers";
 import { getToken } from "./auth";
 import type { NavigationGuardNext } from "vue-router";
-import { toast } from "./toast";
-import { hideFullLoading, showFullLoading } from "./loadingBar";
+import { toast } from "../assets/base-ui/toast";
+import { hideFullLoading, showFullLoading } from "../assets/base-ui/loadingBar";
 import { addDynamicRoutes } from "./route.utils";
 import useUserStore from "@/store/modules/user";
 

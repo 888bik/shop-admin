@@ -59,7 +59,7 @@ import { userLogin } from "@/services/modules/user";
 import { type FormInstance, type FormRules } from "element-plus";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
-import { toast } from "@/utils/toast";
+import { toast } from "@/assets/base-ui/toast";
 import useUserStore from "@/store/modules/user";
 import { setToken } from "@/utils/auth";
 

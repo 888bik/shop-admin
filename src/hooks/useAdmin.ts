@@ -1,5 +1,5 @@
 import { updatePassword } from "@/services/modules/user";
-import { toast } from "@/utils/toast";
+import { toast } from "@/assets/base-ui/toast";
 import type { FormInstance, FormRules } from "element-plus";
 import { reactive, ref } from "vue";
 
@@ -33,7 +33,6 @@ export function UseEdPassword() {
     if (!formRef.value) return;
     try {
       const valid = await formRef.value.validate();
-      console.log("valid", valid);
       if (!valid) return;
 
       updatePassword(form.oldPassword, form.newPassword, form.rePassword);

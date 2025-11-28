@@ -18,7 +18,9 @@
         >
           <!-- 一级菜单 -->
           <template #title>
-            <el-icon :component="item.icon" />
+            <el-icon>
+              <component :is="item.icon" />
+            </el-icon>
             <span>{{ item.name }}</span>
           </template>
           <!-- 二级菜单 -->
@@ -27,7 +29,9 @@
             :key="index2"
             :index="item2.frontpath"
           >
-            <el-icon :component="item2.icon" />
+            <el-icon>
+              <component :is="item2.icon" />
+            </el-icon>
             <span>{{ item2.name }}</span>
           </el-menu-item>
         </el-sub-menu>
@@ -54,6 +58,9 @@ const router = useRouter();
 
 const route = useRoute();
 
+const defaultActive = ref(route.path);
+
+const defaultOpeneds = ref<string[]>([]);
 let menusData = computed(() => {
   return userStore.menus;
 });
@@ -62,19 +69,14 @@ const isCollapse = computed(() => {
   return !(userStore.asideWidth === "250px");
 });
 
-const defaultActive = ref(route.path);
-
-const defaultOpeneds = ref<string[]>([]);
-
 watch(
   () => route.path,
   () => {
-    // 找出当前路径对应的父级菜单 name
-    menusData.value.forEach((item) => {
-      if (item.child && item.child.some((c) => c.frontpath === route.path)) {
-        defaultOpeneds.value = [item.name];
-      }
-    });
+    if (route.path === "/" || route.path === "/home") {
+      defaultActive.value = "/";
+    } else {
+      defaultActive.value = route.path;
+    }
   },
   { immediate: true }
 );
