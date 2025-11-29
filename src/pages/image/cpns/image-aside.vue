@@ -1,6 +1,6 @@
 <template>
   <el-aside width="200px" class="relative" v-loading="isLoading">
-    <div class="image-category">
+    <div class="image-aside">
       <div
         v-for="(item, index) in imageCategoryData"
         :key="item.id"
@@ -17,7 +17,7 @@
             text
             type="primary"
             size="small"
-            @click.stop="$emit('edit', item)"
+            @click.stop="$emit('editCategory', item)"
           >
             <el-icon :size="12"><Edit /></el-icon>
           </el-button>
@@ -26,7 +26,7 @@
             class="deleteBtn"
             type="primary"
             size="small"
-            @click.stop="$emit('delete', item.id)"
+            @click.stop="handleDeleteCategory(item.id)"
           >
             <el-icon :size="12"><Close /></el-icon>
           </el-button>
@@ -47,9 +47,13 @@
 </template>
 
 <script setup lang="ts">
-import { getImageCategory } from "@/services/modules/image";
+import {
+  deleteImageCategory,
+  getImageCategory,
+} from "@/services/modules/image";
 import { ref } from "vue";
 import type { ICategoryItem, IImageCategory, IImageList } from "../type";
+import { toast } from "@/assets/base-ui/toast";
 
 const imageCategoryData = ref<ICategoryItem[]>([]);
 
@@ -62,20 +66,21 @@ const isLoading = ref(false);
 const activeId = ref<number>(0);
 
 const emit = defineEmits<{
-  (e: "change", id: number): void;
-  (e: "edit", data: ICategoryItem): void;
-  (e: "delete", id: number): void;
+  (e: "changeCategory", id: number): void;
+  (e: "editCategory", data: ICategoryItem): void;
+  (e: "deleteCategory", id: number): void;
 }>();
+
 const handlePageChange = async (page: number) => {
-  loadData(page);
+  loadCategoryList(page);
 };
 
 const handleSelected = (id: number) => {
   activeId.value = id;
-  emit("change", id);
+  emit("changeCategory", id);
 };
 
-const loadData = async (page = currentPage.value) => {
+const loadCategoryList = async (page = currentPage.value) => {
   isLoading.value = true;
   try {
     const res: IImageCategory = await getImageCategory(page, limit.value);
@@ -86,21 +91,32 @@ const loadData = async (page = currentPage.value) => {
 
     if (activeId.value === 0 && res.list.length > 0) {
       activeId.value = res.list[0]!.id;
-      emit("change", activeId.value);
+      emit("changeCategory", activeId.value);
     }
   } finally {
     isLoading.value = false;
   }
 };
-loadData();
+
+loadCategoryList();
+
+const handleDeleteCategory = async (id: number) => {
+  try {
+    await deleteImageCategory(id);
+    toast("删除分类成功");
+  } catch (error) {
+    toast("删除分类失败，请重新尝试", "", "error");
+  }
+  loadCategoryList();
+};
 
 defineExpose({
-  loadData,
+  loadCategoryList,
 });
 </script>
 
 <style scoped>
-.image-category {
+.image-aside {
   position: absolute;
   top: 0;
   right: 0;

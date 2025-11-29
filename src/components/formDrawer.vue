@@ -6,6 +6,7 @@
     :close-on-click-modal="closeOnClickModal"
     :teleported="true"
     append-to-body
+    v-model="visible"
   >
     <div class="formDrawer">
       <div class="body">
@@ -20,34 +21,37 @@
 </template>
 
 <script setup lang="ts">
-interface FormDrawerProps {
-  title: string;
-  size?: string;
-  confirmText?: string;
-  destroyOnClose?: boolean;
-  closeOnClickModal?: boolean;
-}
-interface FormDrawerEmits {
+import { computed } from "vue";
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: boolean): void;
   (e: "submit"): void;
-  (e: "close"): void;
-}
+}>();
 
-const {
-  title,
-  size = "45%",
-  confirmText = "提交",
-  destroyOnClose = false, //控制是否在关闭 Drawer 之后将子元素全部销毁
-  closeOnClickModal = false, //是否可以通过点击 modal 关闭 Drawer,设置为false，防止误触
-} = defineProps<FormDrawerProps>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: boolean; // 用于 v-model
+    title: string;
+    size?: string;
+    confirmText?: string;
+    destroyOnClose?: boolean;
+    closeOnClickModal?: boolean;
+  }>(),
+  {
+    size: "45%",
+    confirmText: "提交",
+    destroyOnClose: false,
+    closeOnClickModal: false,
+  }
+);
 
-const emits = defineEmits<FormDrawerEmits>();
+const visible = computed({
+  get: () => props.modelValue,
+  set: (val) => emit("update:modelValue", val),
+});
 
-const submit = () => {
-  return emits("submit");
-};
-const close = () => {
-  return emits("close");
-};
+const submit = () => emit("submit");
+const close = () => emit("update:modelValue", false);
 </script>
 
 <style scoped>

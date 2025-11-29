@@ -58,7 +58,7 @@ import NoticeFooter from "./cpns/notice-footer.vue";
 import NoticeHeader from "./cpns/notice-header.vue";
 import NoticeTable from "./cpns/notice-table.vue";
 import { reactive, ref } from "vue";
-import type { INoticeData, INoticeItem, RuleForm } from "./type";
+import type { INoticeData, INoticeItem, RuleFormNotice } from "./type";
 import {
   addNotice,
   deleteNotice,
@@ -84,7 +84,7 @@ const form = reactive({
 });
 const drawerMode = ref<"add" | "edit" | "delete">("add");
 const drawerTitle = ref("");
-const rules = reactive<FormRules<RuleForm>>({
+const rules = reactive<FormRules<RuleFormNotice>>({
   title: [{ required: true, message: "公告不能为空", trigger: "blur" }],
   content: [{ required: true, message: "公告内容不能为空", trigger: "blur" }],
 });

@@ -11,7 +11,7 @@ export interface INoticeData {
   totalCount: number;
 }
 
-export interface RuleForm {
+export interface RuleFormNotice {
   title: string;
   content: string;
 }

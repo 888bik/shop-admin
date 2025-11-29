@@ -12,8 +12,9 @@
             <el-image
               class="card-cover w-full h-38 object-cover cursor-pointer"
               :src="item.url"
-              :preview-src-list="[item.url]"
+              :preview-src-list="enablePreview ? [item.url] : []"
               fit="cover"
+              @click.stop="handleSelect(item)"
             />
 
             <!-- 悬浮图标按钮 -->
@@ -23,14 +24,14 @@
               <el-button
                 size="small"
                 circle
-                @click.stop="$emit('edit', item.id)"
+                @click.stop="handleEditImage(item.id)"
               >
                 <el-icon><Edit /></el-icon>
               </el-button>
               <el-button
                 size="small"
                 circle
-                @click.stop="$emit('delete', item.id)"
+                @click.stop="handleDeleteImage(item.id)"
               >
                 <el-icon><Delete /></el-icon>
               </el-button>
@@ -54,19 +55,31 @@
 </template>
 
 <script setup lang="ts">
-import { getImageListById } from "@/services/modules/image";
+import {
+  deleteImageById,
+  editImageNameById,
+  getImageListById,
+} from "@/services/modules/image";
 import { ref, watch } from "vue";
 import type { IImageItem, IImageList } from "../type";
+import { openMessageBox } from "@/assets/base-ui/messageBox";
+import { toast } from "@/assets/base-ui/toast";
+
+const props = defineProps({
+  enablePreview: { type: Boolean, default: true }, // 控制是否预览
+  categoryId: { type: Number, default: 0 },
+});
+
+const emit = defineEmits(["select", "editSuccess", "delete"]);
 
 const currentPage = ref(1);
 const limit = ref(10);
-
 const isLoading = ref(false);
 
 const ImageListData = ref<IImageItem[]>([]);
 const totalCount = ref<number>(0);
 // 用来保存当前分类 ID
-const categoryId = ref<number | null>(null);
+const categoryId = ref<number | null>(0);
 
 const loadImageList = async (id?: number) => {
   if (id) {
@@ -94,10 +107,48 @@ loadImageList();
 watch(currentPage, () => {
   loadImageList();
 });
+// 监听 categoryId 变化自动刷新
+watch(
+  () => props.categoryId,
+  (newId) => {
+    loadImageList(newId);
+  }
+);
 
 const handlePageChange = (page: number) => {
   currentPage.value = page;
 };
+
+const handleEditImage = async (id: number) => {
+  try {
+    const NewName = await openMessageBox();
+    if (!NewName) return;
+    await editImageNameById(id, NewName);
+    toast("图片修改成功");
+    //重新加载
+    loadImageList();
+  } catch (error) {
+    toast("图片修改失败，请重新尝试", "", "error");
+  }
+};
+
+const handleDeleteImage = async (id: number) => {
+  try {
+    await deleteImageById([id]);
+    toast("删除图片成功");
+    //重新加载
+    loadImageList();
+  } catch (error) {
+    toast("删除图片失败，请重新尝试", "", "error");
+  }
+};
+
+const handleSelect = (item: any) => {
+  if (!props.enablePreview) {
+    emit("select", item); // 返回选中的图片
+  }
+};
+
 defineExpose({
   loadImageList,
 });
