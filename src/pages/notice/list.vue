@@ -1,27 +1,21 @@
 <template>
   <div class="notice-page">
-    <el-container class="bg-white">
-      <el-header class="flex items-center justify-between border-b-1">
-        <notice-header @refresh="getTableData" @add="openAdd" />
-      </el-header>
+    <el-card shadow="never" class="border-0">
+      <list-header @refresh="getTableData" @add="openAdd" />
 
-      <el-main>
-        <notice-table
-          :data="tableData"
-          :loading="isLoading"
-          @delete="handleDelete"
-          @edit="handleEdit"
-        />
-      </el-main>
+      <notice-table
+        :data="tableData"
+        :loading="isLoading"
+        @delete="handleDelete"
+        @edit="handleEdit"
+      />
 
-      <el-footer>
-        <notice-footer
-          :total="totalCount"
-          :current-page="currentPage"
-          @change="handlePageChange"
-        />
-      </el-footer>
-    </el-container>
+      <notice-footer
+        :total="totalCount"
+        :current-page="currentPage"
+        @change="handlePageChange"
+      />
+    </el-card>
 
     <form-drawer
       :title="drawerTitle"
@@ -68,6 +62,7 @@ import {
 import FormDrawer from "@/components/formDrawer.vue";
 import { type FormInstance, type FormRules } from "element-plus";
 import { toast } from "@/assets/base-ui/toast";
+import ListHeader from "@/components/listHeader.vue";
 
 const tableData = ref<INoticeItem[]>([]);
 const currentPage = ref(1);

@@ -1,10 +1,7 @@
 <template>
   <div class="manager-page">
-    <el-container class="bg-white">
-      <el-header class="flex items-center justify-between border-b-1">
-        <list-header @refresh="refreshData" @add="openAdd" />
-      </el-header>
-
+    <el-card shadow="never" class="border-0">
+      <list-header @refresh="refreshData" @add="openAdd" />
       <manager-table
         ref="managerTableRef"
         @set-roles="
@@ -14,7 +11,7 @@
           "
         @edit="openEdit"
       />
-    </el-container>
+    </el-card>
 
     <ManagerDrawer
       :roles="roles"
