@@ -1,7 +1,6 @@
 import axios from "axios";
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import type { MyRequestConfig } from "./type";
-import Cookies from "js-cookie";
 import { toast } from "@/assets/base-ui/toast";
 import { getToken } from "@/utils/auth";
 
@@ -16,43 +15,66 @@ class MyRequest {
       (config) => {
         //将token添加到请求头中
         const token = getToken("admin-token");
-        if (token) {
-          config.headers["token"] = token;
-        }
+        if (token) config.headers["token"] = token;
+
         return config;
       },
       (err) => {
-        throw err;
+        Promise.reject(err);
       }
     );
     //响应拦截器
     this.instance.interceptors.response.use(
-      (res) => {
-        return res.data;
+      (res: AxiosResponse) => {
+        return res.data.data;
       },
       (err) => {
-        //提示失败
-        //ToDo
-        // toast("登录失败", "请检查账号或密码是否正确", "error");
-        throw err;
+        const msg = err?.response?.data?.msg || "请求失败";
+        toast("请求错误", msg, "error");
+        return Promise.reject(err);
       }
     );
 
     //针对个别请求添加拦截
-    this.instance.interceptors.request.use(
-      config.interceptors?.requestSuccessFn,
-      config.interceptors?.requestFailureFn
-    );
-    this.instance.interceptors.response.use(
-      config.interceptors?.responseSuccessFn,
-      config.interceptors?.responseFailureFn
-    );
+    if (config.interceptors) {
+      const {
+        requestSuccessFn,
+        requestFailureFn,
+        responseSuccessFn,
+        responseFailureFn,
+      } = config.interceptors;
+
+      requestSuccessFn &&
+        this.instance.interceptors.request.use(
+          requestSuccessFn,
+          requestFailureFn
+        );
+      responseSuccessFn &&
+        this.instance.interceptors.response.use(
+          responseSuccessFn,
+          responseFailureFn
+        );
+    }
   }
 
-  request(config: AxiosRequestConfig) {
+  request<T = any>(config: AxiosRequestConfig): Promise<T> {
     return this.instance.request(config);
   }
-  get() {}
-  post() {}
+  get<T = any>(url: string, config?: AxiosRequestConfig) {
+    return this.request<T>({ ...config, url, method: "GET" });
+  }
+
+  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
+    return this.request<T>({ ...config, url, data, method: "POST" });
+  }
+
+  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
+    return this.request<T>({ ...config, url, data, method: "PUT" });
+  }
+
+  delete<T = any>(url: string, config?: AxiosRequestConfig) {
+    return this.request<T>({ ...config, url, method: "DELETE" });
+  }
 }
+
 export default MyRequest;

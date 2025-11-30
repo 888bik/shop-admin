@@ -57,14 +57,14 @@ import type { FormInstance } from "element-plus";
 import { computed, reactive, ref, watch } from "vue";
 import FormDrawer from "@/components/formDrawer.vue";
 
-const token = getToken();
+const token = getToken("admin-token");
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   drawerTitle: { type: String, default: "" },
   drawerMode: { type: String, default: "" },
   categoryId: { type: Number },
-  editData: { type: Object, default: null },
+  editCategoryData: { type: Object, default: null },
 });
 
 const emit = defineEmits(["update:modelValue", "reloadData"]);
@@ -97,14 +97,14 @@ const handleUpload = async (option: any) => {
     console.log(props.categoryId);
     await uploadImageFile(props.categoryId!, file);
     toast("上传成功");
-    emit("reloadData","image");
+    emit("reloadData", "image");
     close();
   } catch {
     toast("上传失败", "", "error");
   }
 };
 watch(
-  () => props.editData,
+  () => props.editCategoryData,
   (val) => {
     if (props.drawerMode === "edit" && val) {
       form.name = val.name;
@@ -135,11 +135,11 @@ const onSubmit = async () => {
       await addImageCategory(form.name, form.order);
       toast("添加分类成功");
     } else if (props.drawerTitle === "修改") {
-      await editImageCategory(props.editData.id, form.name, form.order);
+      await editImageCategory(props.editCategoryData.id, form.name, form.order);
       toast("修改分类成功");
     }
     //重新加载数据
-    emit("reloadData","category");
+    emit("reloadData", "category");
     close();
   } catch (error) {
     console.log("error", error);

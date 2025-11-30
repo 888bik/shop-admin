@@ -103,7 +103,7 @@ const onSubmit = async () => {
 
     if (token) {
       //存储token
-      setToken(token);
+      setToken("admin-token", token);
 
       //提示登录成功
       toast("登录成功", "欢迎回来");

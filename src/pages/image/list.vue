@@ -5,19 +5,21 @@
         <image-header
           @add-category="openAddCategoryDrawer"
           @upload-img="openUploadImgDrawer"
-        ></image-header>
+        />
       </el-header>
       <el-container>
         <image-aside
           ref="imageAsideRef"
           @change-category="(id) => (categoryId = id)"
           @edit-category="openEditCategoryDrawer"
-        ></image-aside>
+        />
 
         <image-content
           ref="imageContentRef"
           :category-id="categoryId"
-        ></image-content>
+          :enable-preview="enablePreview"
+          @select="handleSelect"
+        />
       </el-container>
     </el-container>
 
@@ -26,7 +28,7 @@
       :drawer-mode="drawerMode"
       :drawer-title="drawerTitle"
       @reload-data="reloadCategoryList"
-      :edit-data="editData"
+      :edit-category-data="editCategoryData"
       :category-id="categoryId"
     />
   </div>
@@ -40,6 +42,11 @@ import ImageHeader from "./cpns/image-header.vue";
 import CategoryDrawer from "./cpns/CategoryDrawer.vue";
 import type { ICategoryItem } from "./type";
 
+const props = defineProps({
+  enablePreview: { type: Boolean, default: true },
+});
+const emit = defineEmits(["select"]);
+
 const windowHeight = window.innerHeight || document.body.clientHeight;
 const h = windowHeight - 64 - 44 - 40;
 
@@ -48,7 +55,7 @@ const showDrawer = ref(false);
 const imageContentRef = ref();
 
 const categoryId = ref(0);
-const editData = ref<ICategoryItem>();
+const editCategoryData = ref<ICategoryItem>();
 const drawerTitle = ref("");
 
 const drawerMode = ref<"add" | "edit" | "upload">("add");
@@ -69,7 +76,7 @@ const openEditCategoryDrawer = (data: ICategoryItem) => {
   drawerTitle.value = "修改";
   drawerMode.value = "edit";
   // 数据回填
-  editData.value = { ...data };
+  editCategoryData.value = { ...data };
   showDrawer.value = true;
 };
 
@@ -79,6 +86,10 @@ const reloadCategoryList = (e: string) => {
   } else if (e === "category") {
     imageAsideRef.value.loadCategoryList();
   }
+};
+
+const handleSelect = (item: any) => {
+  emit("select", item.url);
 };
 </script>
 

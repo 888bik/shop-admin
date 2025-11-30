@@ -1,142 +1,49 @@
-import type { AxiosError } from "axios";
 import { imageRequest } from "..";
 
-export function getImageCategory(page: number = 1, limit: number = 10) {
-  return imageRequest
-    .request({
-      url: `admin/image_class/${page}`,
-      method: "get",
-      params: {
-        limit,
-      },
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+export const getImageCategory = (page: number = 1, limit: number = 10) => {
+  return imageRequest.get(`admin/image_class/${page}`, { params: { limit } });
+};
 
-export function addImageCategory(name: string, order: number) {
-  return imageRequest
-    .request({
-      url: "/admin/image_class",
-      method: "post",
-      data: {
-        name,
-        order,
-      },
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+export const addImageCategory = (name: string, order: number) => {
+  return imageRequest.post("admin/image_class", { name, order });
+};
 
-export function editImageCategory(id: number, name: string, order: number) {
-  return imageRequest
-    .request({
-      url: `/admin/image_class/${id}`,
-      method: "post",
-      data: {
-        name,
-        order,
-      },
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+export const editImageCategory = (id: number, name: string, order: number) => {
+  return imageRequest.post(`admin/image_class/${id}`, { name, order });
+};
 
-export function deleteImageCategory(id: number) {
-  return imageRequest
-    .request({
-      url: `/admin/image_class/${id}/delete`,
-      method: "post",
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      throw err;
-    });
-}
+export const deleteImageCategory = (id: number) => {
+  return imageRequest.post(`admin/image_class/${id}/delete`);
+};
 
-export function getImageListById(
+export const getImageListById = (
   categoryId: number,
   currentPage: number,
   limit: number = 10
-) {
-  return imageRequest
-    .request({
-      url: `admin/image_class/${categoryId}/image/${currentPage}`,
-      method: "get",
-      params: {
-        limit,
-      },
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      throw err;
-    });
-}
+) => {
+  return imageRequest.get(
+    `admin/image_class/${categoryId}/image/${currentPage}`,
+    { params: { limit } }
+  );
+};
 
-export function deleteImageById(ids: any[]) {
-  return imageRequest
-    .request({
-      url: "admin/image/delete_all",
-      method: "post",
-      data: {
-        ids,
-      },
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err: AxiosError) => {
-      throw err;
-    });
-}
+export const deleteImageById = (ids: any[]) => {
+  return imageRequest.post("admin/image/delete_all", { ids });
+};
 
-export function editImageNameById(id: number, name: string) {
-  return imageRequest
-    .request({
-      url: `admin/image/${id}`,
-      method: "post",
-      data: {
-        name,
-      },
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      throw err;
-    });
-}
+// 数据格式：普通对象 → Axios 会自动 JSON.stringify()
+// Content-Type：默认 application/json;charset=UTF-8
+// 适用场景：提交结构化数据
+export const editImageNameById = (id: number, name: string) => {
+  return imageRequest.post(`admin/image/${id}`, { name });
+};
 
-export function uploadImageFile(categoryId: number, file: File) {
+// 数据格式：FormData 对象 → 可以附带文件和普通字段
+// Content-Type：multipart/form-data（Axios 会自动设置 boundary）
+// 适用场景：上传图片、视频、文件，或者表单中混合文件和文本字段
+export const uploadImageFile = (categoryId: number, file: File) => {
   const formData = new FormData();
   formData.append("img", file);
   formData.append("image_class_id", String(categoryId));
-  return imageRequest
-    .request({
-      url: "/admin/image/upload",
-      method: "post",
-      data: formData,
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      throw err;
-    });
-}
+  return imageRequest.post("admin/image/upload", formData);
+};

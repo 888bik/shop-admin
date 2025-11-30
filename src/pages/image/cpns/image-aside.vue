@@ -84,7 +84,6 @@ const loadCategoryList = async (page = currentPage.value) => {
   isLoading.value = true;
   try {
     const res: IImageCategory = await getImageCategory(page, limit.value);
-
     imageCategoryData.value = res.list;
     totalCount.value = res.totalCount;
     currentPage.value = page;

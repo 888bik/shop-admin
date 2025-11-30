@@ -1,13 +1,14 @@
 import Cookies from "js-cookie";
 
-const TokenKey = "admin-token";
-
-export function setToken(token: string) {
-  Cookies.set(TokenKey, token);
+export function setToken(tokenKey: string, token: string) {
+  Cookies.set(tokenKey, JSON.stringify(token));
 }
-export function getToken(key: string = TokenKey) {
-  return Cookies.get(key);
+export function getToken(tokenKey: string) {
+  const jsonString = Cookies.get(tokenKey);
+  if (jsonString) {
+    return JSON.parse(jsonString).token;
+  }
 }
-export function removeToken(key: string = TokenKey) {
-  Cookies.remove(key);
+export function removeToken(tokenKey: string) {
+  Cookies.remove(tokenKey);
 }

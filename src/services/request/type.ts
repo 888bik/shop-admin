@@ -3,14 +3,16 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+
 export interface IInterceptors {
   requestSuccessFn?: (
     config: InternalAxiosRequestConfig
   ) => InternalAxiosRequestConfig;
-  requestFailureFn?: (err: unknown) => unknown;
+  requestFailureFn?: (err: any) => any;
   responseSuccessFn?: (res: AxiosResponse) => AxiosResponse;
-  responseFailureFn?: (err: unknown) => unknown;
+  responseFailureFn?: (err: any) => any;
 }
+
 export interface MyRequestConfig extends AxiosRequestConfig {
   interceptors?: IInterceptors;
 }

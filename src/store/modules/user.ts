@@ -1,12 +1,12 @@
 import { getUserInfo } from "@/services/modules/user";
 import { defineStore } from "pinia";
-import type { MenuItem } from "../type";
+import type { IUser, UserState } from "../type";
 
 const useUserStore = defineStore("user", {
-  state: () => {
+  state: (): UserState => {
     return {
-      user: {},
-      menus: [] as MenuItem[],
+      user: null,
+      menus: [],
       asideWidth: "250px",
       hasRoutes: false,
       ruleNames: [],
@@ -14,7 +14,7 @@ const useUserStore = defineStore("user", {
   },
   actions: {
     async fetchUserInfo() {
-      const res = await getUserInfo();
+      const res: IUser = await getUserInfo();
       this.user = res;
       this.menus = res.menus;
       this.ruleNames = res.ruleNames;

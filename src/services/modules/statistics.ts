@@ -1,46 +1,13 @@
 import { statisticsRequest } from "..";
 
-export function getStatistics1() {
-  return statisticsRequest
-    .request({
-      url: "admin/statistics1",
-      method: "get",
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+export const getStatistics1 = () => {
+  return statisticsRequest.get("admin/statistics1");
+};
 
-export function getStatistics2() {
-  return statisticsRequest
-    .request({
-      url: "admin/statistics2",
-      method: "get",
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+export const getStatistics2 = () => {
+  return statisticsRequest.get("admin/statistics2");
+};
 
-export function getStatistics3(type: string) {
-  return statisticsRequest
-    .request({
-      url: "admin/statistics3",
-      method: "get",
-      params: {
-        type,
-      },
-    })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+export const getStatistics3 = (type: string) => {
+  return statisticsRequest.get("admin/statistics3", { params: { type } });
+};
