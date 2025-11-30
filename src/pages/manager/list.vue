@@ -2,7 +2,7 @@
   <div class="manager-page">
     <el-container class="bg-white">
       <el-header class="flex items-center justify-between border-b-1">
-        <manager-header @refresh="refreshData" @add="openAddManagerDrawer" />
+        <list-header @refresh="refreshData" @add="openAdd" />
       </el-header>
 
       <manager-table
@@ -12,34 +12,34 @@
               roles = res;
             }
           "
-        @edit="openEditManagerDrawer"
+        @edit="openEdit"
       />
     </el-container>
 
     <ManagerDrawer
       :roles="roles"
-      :drawer-title="drawerTitle"
-      :avatar-url="avatarUrl"
-      v-model="showDrawer"
-      @change-dialog-visible="dialogFormVisible = true"
+      :drawer-title="title"
+      :avatar-url="imageUrl"
+      v-model="visible"
+      @change-dialog-visible="openSelector"
       @reload-data="refreshData"
-      :edit-manager-data="editManagerData!"
-      :drawer-mode="drawerMode"
+      :edit-manager-data="editData!"
+      :drawer-mode="mode"
     />
 
     <el-dialog
-      v-model="dialogFormVisible"
+      v-model="dialogVisible"
       title="选择图片"
       width="80%"
       top="5vh"
       :close-on-click-modal="false"
     >
-      <ImageList @select="handleSelectImage" :enable-preview="false" />
+      <ImageList @select="handleSelect" :enable-preview="false" />
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="dialogVisible = false">
             确认
           </el-button>
         </div>
@@ -50,49 +50,27 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import ManagerFooter from "./cpns/manager-footer.vue";
 import ManagerTable from "./cpns/manager-table.vue";
-import ManagerHeader from "./cpns/manager-header.vue";
 import ImageList from "@/pages/image/list.vue";
-import ManagerDrawer from "./cpns/ManagerDrawer.vue";
+import ManagerDrawer from "./cpns/manager-drawer.vue";
+import ListHeader from "@/components/listHeader.vue";
+
 import type { IManagerItem, IRole } from "./type";
+import { useFormDrawer } from "@/hooks/useFormDrawer";
+import { useImageSelector } from "@/hooks/useImageSelector";
+
+const { visible, title, mode, editData, openAdd, openEdit } =
+  useFormDrawer<IManagerItem>();
+
+const { dialogVisible, imageUrl, openSelector, handleSelect } =
+  useImageSelector();
 
 const roles = ref<IRole[]>();
 
 const managerTableRef = ref();
 
-const avatarUrl = ref("");
-
-const editManagerData = ref<IManagerItem>();
-
-const showDrawer = ref(false);
-
-const drawerMode = ref<"add" | "edit" | "delete">("add");
-
-const drawerTitle = ref("");
-
-const dialogFormVisible = ref(false);
-
 const refreshData = () => {
   managerTableRef.value.getTableData();
-};
-
-const handleSelectImage = (url: string) => {
-  avatarUrl.value = url;
-  dialogFormVisible.value = false;
-};
-
-const openAddManagerDrawer = () => {
-  drawerTitle.value = "新增";
-  drawerMode.value = "add";
-  showDrawer.value = true;
-};
-
-const openEditManagerDrawer = (data: IManagerItem) => {
-  editManagerData.value = { ...data };
-  drawerTitle.value = "修改";
-  drawerMode.value = "edit";
-  showDrawer.value = true;
 };
 </script>
 

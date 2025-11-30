@@ -107,6 +107,7 @@ loadImageList();
 watch(currentPage, () => {
   loadImageList();
 });
+
 // 监听 categoryId 变化自动刷新
 watch(
   () => props.categoryId,

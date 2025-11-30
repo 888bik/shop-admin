@@ -71,7 +71,7 @@ interface FormDrawerProps {
   drawerTitle: string;
   avatarUrl: string;
   editManagerData?: IManagerItem;
-  drawerMode: "add" | "edit" | "delete";
+  drawerMode: "add" | "edit" | "upload";
 }
 interface DrawerEmits {
   (e: "update:modelValue", FormDrawerVisible: boolean): void;

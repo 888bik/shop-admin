@@ -7,7 +7,11 @@
 </template>
 
 <script setup lang="ts">
-defineEmits(["add", "refresh"]);
+interface ListHeaderEmits {
+  (e: "add"): void;
+  (e: "refresh"): void;
+}
+defineEmits<ListHeaderEmits>();
 </script>
 
 <style scoped></style>

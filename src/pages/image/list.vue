@@ -2,16 +2,13 @@
   <div class="image-page">
     <el-container class="bg-white" :style="{ height: h + 'px' }">
       <el-header class="image-header">
-        <image-header
-          @add-category="openAddCategoryDrawer"
-          @upload-img="openUploadImgDrawer"
-        />
+        <image-header @add-category="openAdd" @upload-img="openUpload" />
       </el-header>
       <el-container>
         <image-aside
           ref="imageAsideRef"
           @change-category="(id) => (categoryId = id)"
-          @edit-category="openEditCategoryDrawer"
+          @edit-category="handleEditCategory"
         />
 
         <image-content
@@ -24,12 +21,12 @@
     </el-container>
 
     <category-drawer
-      v-model="showDrawer"
-      :drawer-mode="drawerMode"
-      :drawer-title="drawerTitle"
+      v-model="visible"
+      :title="title"
+      :mode="mode"
       @reload-data="reloadCategoryList"
-      :edit-category-data="editCategoryData"
       :category-id="categoryId"
+      :edit-data="editData"
     />
   </div>
 </template>
@@ -39,46 +36,26 @@ import { ref } from "vue";
 import ImageAside from "./cpns/image-aside.vue";
 import ImageContent from "./cpns/image-content.vue";
 import ImageHeader from "./cpns/image-header.vue";
-import CategoryDrawer from "./cpns/CategoryDrawer.vue";
+import CategoryDrawer from "./cpns/image-drawer.vue";
 import type { ICategoryItem } from "./type";
+import { useFormDrawer } from "@/hooks/useFormDrawer";
 
 const props = defineProps({
   enablePreview: { type: Boolean, default: true },
 });
+
 const emit = defineEmits(["select"]);
 
 const windowHeight = window.innerHeight || document.body.clientHeight;
 const h = windowHeight - 64 - 44 - 40;
 
+const { visible, title, mode, editData, openAdd, openEdit, openUpload, close } =
+  useFormDrawer<ICategoryItem>();
+
 const imageAsideRef = ref();
-const showDrawer = ref(false);
 const imageContentRef = ref();
 
 const categoryId = ref(0);
-const editCategoryData = ref<ICategoryItem>();
-const drawerTitle = ref("");
-
-const drawerMode = ref<"add" | "edit" | "upload">("add");
-
-const openAddCategoryDrawer = () => {
-  showDrawer.value = true;
-  drawerTitle.value = "新增";
-  drawerMode.value = "add";
-};
-
-const openUploadImgDrawer = () => {
-  showDrawer.value = true;
-  drawerMode.value = "upload";
-  drawerTitle.value = "上传图片";
-};
-
-const openEditCategoryDrawer = (data: ICategoryItem) => {
-  drawerTitle.value = "修改";
-  drawerMode.value = "edit";
-  // 数据回填
-  editCategoryData.value = { ...data };
-  showDrawer.value = true;
-};
 
 const reloadCategoryList = (e: string) => {
   if (e === "image") {
@@ -86,6 +63,10 @@ const reloadCategoryList = (e: string) => {
   } else if (e === "category") {
     imageAsideRef.value.loadCategoryList();
   }
+};
+
+const handleEditCategory = (item: ICategoryItem) => {
+  openEdit(item, "修改分类");
 };
 
 const handleSelect = (item: any) => {

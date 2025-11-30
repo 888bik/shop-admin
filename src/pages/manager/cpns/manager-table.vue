@@ -81,15 +81,12 @@ import {
   updateManagerStatus,
 } from "@/services/modules/manager";
 import { toast } from "@/assets/base-ui/toast";
-interface TableProps {}
 interface TableEmits {
   (e: "set-roles", roles: IRole[]): void;
   (e: "edit", role: IManagerItem): void;
   (e: "delete", id: number): void;
   (e: "status-change", status: number): void;
 }
-
-defineProps<TableProps>();
 
 const emit = defineEmits<TableEmits>();
 

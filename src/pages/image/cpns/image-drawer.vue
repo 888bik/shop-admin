@@ -1,12 +1,12 @@
 <template>
   <form-drawer
-    :title="drawerTitle"
+    :title="props.title"
     ref="formDrawRef"
     v-model="visible"
     @close="close"
     @submit="onSubmit"
   >
-    <template v-if="drawerMode === 'add' || drawerMode === 'edit'">
+    <template v-if="mode === 'add' || mode === 'edit'">
       <el-form
         :model="form"
         ref="formRef"
@@ -22,7 +22,7 @@
         </el-form-item>
       </el-form>
     </template>
-    <template v-else-if="drawerMode === 'upload'">
+    <template v-else-if="mode === 'upload'">
       <el-upload
         drag
         :http-request="handleUpload"
@@ -54,20 +54,38 @@ import {
 } from "@/services/modules/image";
 import { getToken } from "@/utils/auth";
 import type { FormInstance } from "element-plus";
-import { computed, reactive, ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import FormDrawer from "@/components/formDrawer.vue";
 
+interface IProps {
+  modelValue: boolean;
+  title: string;
+  mode: "add" | "edit" | "upload";
+  categoryId: number;
+  editData: any | null;
+}
 const token = getToken("admin-token");
 
-const props = defineProps({
-  modelValue: { type: Boolean, default: false },
-  drawerTitle: { type: String, default: "" },
-  drawerMode: { type: String, default: "" },
-  categoryId: { type: Number },
-  editCategoryData: { type: Object, default: null },
+const props = defineProps<IProps>();
+const emit = defineEmits(["update:modelValue", "reloadData"]);
+
+const visible = ref(false);
+
+watch(
+  () => props.modelValue,
+  (v) => (visible.value = v)
+);
+const close = () => emit("update:modelValue", false);
+
+const form = reactive({
+  name: "",
+  order: 50,
 });
 
-const emit = defineEmits(["update:modelValue", "reloadData"]);
+const setForm = (data: any) => {
+  form.name = data.name;
+  form.order = data.order;
+};
 
 const rules = {
   name: [
@@ -79,17 +97,14 @@ const rules = {
   ],
 };
 
-const form = reactive({
-  name: "",
-  order: 50,
-});
-
 const formRef = ref<FormInstance>();
 
-const visible = computed({
-  get: () => props.modelValue,
-  set: (v) => emit("update:modelValue", v),
-});
+// 自动回填
+watch(
+  () => props.editData,
+  (v) => v && props.mode === "edit" && setForm(v),
+  { immediate: true }
+);
 
 const handleUpload = async (option: any) => {
   const file = option.file;
@@ -103,47 +118,22 @@ const handleUpload = async (option: any) => {
     toast("上传失败", "", "error");
   }
 };
-watch(
-  () => props.editCategoryData,
-  (val) => {
-    if (props.drawerMode === "edit" && val) {
-      form.name = val.name;
-      form.order = val.order;
-    }
-  },
-  { immediate: true }
-);
-// 同步父到子
-watch(
-  () => props.modelValue,
-  (v) => (visible.value = v)
-);
-
-// 同步子到父（抽屉关闭时会传 false）
-const close = () => {
-  visible.value = false; // 自动触发 update:modelValue
-};
 
 const onSubmit = async () => {
-  if (props.drawerMode === "upload") return; // 上传无需提交按钮;
+  if (props.mode === "upload") return;
 
-  try {
-    const valid = await formRef.value?.validate();
-    if (!valid) return;
-
-    if (props.drawerTitle === "新增") {
-      await addImageCategory(form.name, form.order);
-      toast("添加分类成功");
-    } else if (props.drawerTitle === "修改") {
-      await editImageCategory(props.editCategoryData.id, form.name, form.order);
-      toast("修改分类成功");
-    }
-    //重新加载数据
-    emit("reloadData", "category");
-    close();
-  } catch (error) {
-    console.log("error", error);
+  if (props.mode === "add") {
+    await addImageCategory(form.name, form.order);
+    toast("添加分类成功");
   }
+
+  if (props.mode === "edit" && props.editData) {
+    await editImageCategory(props.editData.id, form.name, form.order);
+    toast("修改分类成功");
+  }
+
+  emit("reloadData", "category");
+  close();
 };
 </script>
 

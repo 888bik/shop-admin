@@ -17,7 +17,7 @@
             text
             type="primary"
             size="small"
-            @click.stop="$emit('editCategory', item)"
+            @click.stop="handleEditCategory"
           >
             <el-icon :size="12"><Edit /></el-icon>
           </el-button>
@@ -54,6 +54,15 @@ import {
 import { ref } from "vue";
 import type { ICategoryItem, IImageCategory, IImageList } from "../type";
 import { toast } from "@/assets/base-ui/toast";
+import { useFormDrawer } from "@/hooks/useFormDrawer";
+
+const emit = defineEmits<{
+  (e: "changeCategory", id: number): void;
+  (e: "editCategory", data: ICategoryItem): void;
+  (e: "deleteCategory", id: number): void;
+}>();
+
+const { openEdit } = useFormDrawer<ICategoryItem>();
 
 const imageCategoryData = ref<ICategoryItem[]>([]);
 
@@ -65,12 +74,6 @@ const isLoading = ref(false);
 
 const activeId = ref<number>(0);
 
-const emit = defineEmits<{
-  (e: "changeCategory", id: number): void;
-  (e: "editCategory", data: ICategoryItem): void;
-  (e: "deleteCategory", id: number): void;
-}>();
-
 const handlePageChange = async (page: number) => {
   loadCategoryList(page);
 };
@@ -78,6 +81,10 @@ const handlePageChange = async (page: number) => {
 const handleSelected = (id: number) => {
   activeId.value = id;
   emit("changeCategory", id);
+};
+
+const handleEditCategory = (item: ICategoryItem) => {
+  emit("editCategory", item);
 };
 
 const loadCategoryList = async (page = currentPage.value) => {

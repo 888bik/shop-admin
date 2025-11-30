@@ -11,10 +11,13 @@ import DefaultLayout from "@/layout/DefaultLayout.vue";
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    redirect: "/home",
     component: DefaultLayout,
     name: "Layout",
     children: [
+      {
+        path: "",
+        redirect: "/home",
+      },
       {
         path: "/home",
         component: () => import("@/pages/home/home.vue"),

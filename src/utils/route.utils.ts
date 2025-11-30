@@ -1,5 +1,5 @@
 import router from "@/routers";
-import type { MenuItem } from "@/store/modules/user";
+import type { MenuItem } from "@/store/type";
 import type { RouteRecordRaw } from "vue-router";
 
 const modules = import.meta.glob("@/pages/**/*.vue");
@@ -24,7 +24,7 @@ export function generateRoutesFromMenus(menus: MenuItem[]): RouteRecordRaw[] {
 
   menus.forEach((item) => {
     if (item.child && item.child.length) {
-      item.child.forEach((item2) => {
+      item.child.forEach((item2: any) => {
         routes.push({
           path: item2.frontpath,
           name: item2.frontpath,
