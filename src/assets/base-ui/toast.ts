@@ -4,7 +4,7 @@ export function toast(
   title: string,
   message?: string,
   type: "success" | "error" | "warning" | "info" = "success",
-  dangerouslyUseHTMLString = false
+  dangerouslyUseHTMLString = true
 ) {
   ElNotification({
     title,

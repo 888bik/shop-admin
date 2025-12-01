@@ -49,7 +49,6 @@
 
 <script setup lang="ts">
 import NoticeFooter from "./cpns/notice-footer.vue";
-import NoticeHeader from "./cpns/notice-header.vue";
 import NoticeTable from "./cpns/notice-table.vue";
 import { reactive, ref } from "vue";
 import type { INoticeData, INoticeItem, RuleFormNotice } from "./type";
