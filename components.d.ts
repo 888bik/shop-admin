@@ -79,6 +79,8 @@ declare module 'vue' {
     ListHeader: typeof import('./src/components/listHeader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Tag: typeof import('./src/components/tag.vue')['default']
+    TagInput: typeof import('./src/components/tagInput.vue')['default']
   }
   export interface GlobalDirectives {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

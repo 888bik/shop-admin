@@ -142,7 +142,6 @@ import {
   updateRuleStatus,
 } from "@/services/modules/rule";
 import type { IRuleItem } from "@/services/modules/rule";
-import useRuleStore from "@/store/modules/rule";
 import { ref } from "vue";
 
 const listData = ref<IRuleItem[]>();
@@ -150,8 +149,6 @@ const rulesData = ref<IRuleItem[]>();
 const totalCount = ref<number>(0);
 
 const loading = ref(false);
-
-const ruleStore = useRuleStore();
 
 const {
   visible,

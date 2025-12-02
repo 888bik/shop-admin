@@ -1,3 +1,4 @@
+import { toast } from "@/assets/base-ui/toast";
 import type { FormInstance, FormRules } from "element-plus";
 import { reactive, ref } from "vue";
 
@@ -65,6 +66,7 @@ export function useFormDrawer<T = any>(
     try {
       if (mode.value === "add" && apis?.createApi) {
         await apis.createApi(form);
+        console.log(form);
       } else if (mode.value === "edit" && apis?.updateApi && editData.value) {
         const id = editData.value["id"];
         // await apis.updateApi(id, form as T);
@@ -72,6 +74,7 @@ export function useFormDrawer<T = any>(
       } else if (mode.value === "upload" && apis?.uploadApi) {
         await apis.uploadApi(form);
       }
+      toast("操作成功");
       //刷新数据
       onSuccess && onSuccess();
       close();
