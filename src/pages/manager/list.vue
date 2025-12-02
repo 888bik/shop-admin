@@ -1,28 +1,139 @@
 <template>
   <div class="manager-page">
     <el-card shadow="never" class="border-0">
-      <list-header @refresh="refreshData" @add="openAdd" />
-      <manager-table
-        ref="managerTableRef"
-        @set-roles="
-            (res:any) => {
-              roles = res;
-            }
-          "
-        @edit="openEdit"
-      />
+      <SearchInput v-model="keyword" @search="getTableData" />
+      <ListHeader @refresh="getTableData" @add="openAdd" />
+
+      <el-table
+        :data="tableData"
+        stripe
+        style="width: 100%"
+        v-loading="loading"
+      >
+        <el-table-column prop="username" label="管理员">
+          <template #default="scope">
+            <div class="flex items-center gap-5">
+              <el-avatar :size="40" :src="scope.row.avatar" class="shrink-0">
+                <img
+                  src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
+                />
+              </el-avatar>
+
+              <div class="flex flex-col max-w-[140px] overflow-hidden">
+                <span class="font-medium leading-tight truncate">
+                  {{ scope.row.username }}
+                </span>
+                <span class="text-xs text-gray-500 mt-0.5">
+                  ID:{{ scope.row.id }}
+                </span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="role.name" label="所属角色" align="center" />
+        <el-table-column prop="status" label="状态" align="center">
+          <template #default="scope">
+            <el-switch
+              v-model="scope.row.status"
+              :active-value="1"
+              :inactive-value="0"
+              @change="handleChangeStatus(scope.row.id, scope.row.status)"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180" align="center">
+          <template #default="scope">
+            <span style="margin-left: 10px">
+              <el-button
+                type="primary"
+                size="small"
+                text
+                @click="openEdit({ ...scope.row, role: scope.row.role?.id })"
+                >修改</el-button
+              >
+              <el-button
+                type="primary"
+                size="small"
+                text
+                @click="handleDelete(scope.row.id)"
+                >删除</el-button
+              >
+            </span>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div class="flex items-center justify-center mt-4">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="totalCount"
+          :current-page="currentPage"
+          @current-change="handlePageChange"
+        />
+      </div>
     </el-card>
 
-    <ManagerDrawer
-      :roles="roles"
-      :drawer-title="title"
-      :avatar-url="imageUrl"
+    <form-drawer
+      :title="title"
+      @submit="submit"
+      ref="formDrawerRef"
       v-model="visible"
-      @change-dialog-visible="openSelector"
-      @reload-data="refreshData"
-      :edit-manager-data="editData!"
-      :drawer-mode="mode"
-    />
+    >
+      <el-form
+        :model="form"
+        ref="formRef"
+        label-width="80px"
+        :inline="false"
+        :rules="rules"
+      >
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="form.username" placeholder="用户名" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="form.password"
+            type="password"
+            placeholder="密码"
+          />
+        </el-form-item>
+        <el-form-item label="头像" prop="avatar">
+          <div @click="dialogVisible = true">
+            <template v-if="form.avatar">
+              <el-image
+                :src="form.avatar"
+                fit="cover"
+                style="width: 100px; height: 100px; border-radius: 4px"
+              />
+            </template>
+            <template v-else>
+              <div class="avatar-picker">
+                <el-icon :size="25" class="text-gray-500"><Plus /></el-icon>
+              </div>
+            </template>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="所属角色">
+          <el-select v-model="form.role" placeholder="选择所属角色">
+            <el-option
+              v-for="(item, index) in roles"
+              :label="item.name"
+              :value="item.id"
+              :key="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-switch
+            v-model="form.status"
+            :active-value="1"
+            :inactive-value="0"
+          />
+        </el-form-item>
+      </el-form>
+    </form-drawer>
 
     <el-dialog
       v-model="dialogVisible"
@@ -46,29 +157,116 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import ManagerTable from "./cpns/manager-table.vue";
+import { ref, watch } from "vue";
 import ImageList from "@/pages/image/list.vue";
-import ManagerDrawer from "./cpns/manager-drawer.vue";
 import ListHeader from "@/components/listHeader.vue";
-
 import type { IManagerItem, IRole } from "./type";
 import { useFormDrawer } from "@/hooks/useFormDrawer";
 import { useImageSelector } from "@/hooks/useImageSelector";
-
-const { visible, title, mode, editData, openAdd, openEdit } =
-  useFormDrawer<IManagerItem>();
+import SearchInput from "@/components/searchInput.vue";
+import {
+  createManager,
+  deleteManager,
+  getManagerList,
+  updateManager,
+  updateManagerStatus,
+} from "@/services/modules/manager";
+import FormDrawer from "@/components/formDrawer.vue";
+import { toast } from "@/assets/base-ui/toast";
 
 const { dialogVisible, imageUrl, openSelector, handleSelect } =
   useImageSelector();
 
 const roles = ref<IRole[]>();
+const tableData = ref<IManagerItem[]>([]);
+const currentPage = ref(1);
+const totalCount = ref(0);
+const limit = ref(10);
+const keyword = ref("");
 
-const managerTableRef = ref();
+const {
+  visible,
+  title,
+  openAdd,
+  openEdit,
+  form,
+  rules,
+  submit,
+  formRef,
+  formDrawerRef,
+  loading,
+} = useFormDrawer(
+  {
+    username: [{ required: true, message: "用户名不能为空" }],
+    password: [{ required: true, message: "密码不能为空" }],
+    avatar: [{ required: true, message: "请选择头像" }],
+    role: [{ required: true, message: "请选择角色" }],
+  },
+  {
+    username: "",
+    password: "",
+    avatar: "",
+    role: "",
+    status: 0,
+    roleId: 0,
+  },
+  {
+    createApi: createManager,
+    updateApi: updateManager,
+  },
+  () => getTableData()
+);
 
-const refreshData = () => {
-  managerTableRef.value.getTableData();
+const getTableData = async () => {
+  loading.value = true;
+  const res = await getManagerList(
+    currentPage.value,
+    limit.value,
+    keyword.value
+  );
+
+  tableData.value = res.list;
+  totalCount.value = res.totalCount;
+  roles.value = res.roles;
+
+  loading.value = false;
 };
+getTableData();
+
+const handleDelete = async (id: number) => {
+  loading.value = true;
+  await deleteManager(id);
+  toast("删除成功");
+  loading.value = false;
+  getTableData();
+};
+
+const handleChangeStatus = async (id: number, status: number) => {
+  loading.value = true;
+  await updateManagerStatus(id, status);
+  toast("修改成功");
+  loading.value = false;
+};
+
+watch(imageUrl, (val) => {
+  if (val) {
+    form.avatar = val;
+  }
+});
+
+watch(
+  () => form.role,
+  (val) => {
+    form.roleId = val;
+  }
+);
+const handlePageChange = (page: number) => {
+  currentPage.value = page;
+};
+
+watch(currentPage, () => {
+  getTableData();
+});
 </script>
 
 <style scoped>
@@ -78,5 +276,8 @@ const refreshData = () => {
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
   margin: 0 !important;
+}
+.avatar-picker {
+  @apply w-[100px] h-[100px] rounded border flex justify-center items-center cursor-pointer hover:(bg-gray-100);
 }
 </style>

@@ -8,10 +8,8 @@ interface ManagerPayload {
   roleId: number;
 }
 
-interface AddManagerPayload extends ManagerPayload {}
-interface UpdateManagerPayload extends AddManagerPayload {
-  managerId: number;
-}
+interface createManagerPayload extends ManagerPayload {}
+interface UpdateManagerPayload extends ManagerPayload {}
 
 interface ManagerListResponse {
   list: IManagerItem[];
@@ -37,21 +35,21 @@ export const getManagerList = (page = 1, limit = 10, keyword = "") => {
  * @param payload
  * @returns
  */
-export const addManager = (payload: AddManagerPayload) => {
+export const createManager = (payload: createManagerPayload) => {
   return managerRequest.post("admin/manager", {
     ...payload,
     role_id: payload.roleId,
   });
 };
 
-export const updateManager = (payload: UpdateManagerPayload) => {
-  return managerRequest.post(`admin/manager/${payload.managerId}`, {
+export const updateManager = (id: number, payload: UpdateManagerPayload) => {
+  return managerRequest.post(`admin/manager/${id}`, {
     ...payload,
     role_id: payload.roleId,
   });
 };
 
-export const deleteManagerById = (id: number) => {
+export const deleteManager = (id: number) => {
   return managerRequest.post(`admin/manager/${id}/delete`);
 };
 

@@ -80,6 +80,8 @@ declare module 'vue' {
     ListHeader: typeof import('./src/components/listHeader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SearchBar: typeof import('./src/components/searchBar.vue')['default']
+    SearchInput: typeof import('./src/components/searchInput.vue')['default']
     Tag: typeof import('./src/components/tag.vue')['default']
     TagInput: typeof import('./src/components/tagInput.vue')['default']
   }

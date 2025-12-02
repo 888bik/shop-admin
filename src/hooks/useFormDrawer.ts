@@ -77,6 +77,8 @@ export function useFormDrawer<T = any>(
       //刷新数据
       onSuccess && onSuccess();
       close();
+    } catch (err) {
+      console.log(err);
     } finally {
       loading.value = false;
     }
