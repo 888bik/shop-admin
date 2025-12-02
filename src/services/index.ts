@@ -26,7 +26,12 @@ export const managerRequest = new MyRequest({
   timeout: TIMEOUT,
 });
 
-export const ruleRequests = new MyRequest({
+export const ruleRequest = new MyRequest({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT,
+});
+
+export const roleRequest = new MyRequest({
   baseURL: BASE_URL,
   timeout: TIMEOUT,
 });

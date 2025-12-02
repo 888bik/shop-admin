@@ -1,4 +1,4 @@
-import { ruleRequests } from "..";
+import { ruleRequest } from "..";
 
 export interface IRuleItem {
   id: number;
@@ -36,21 +36,25 @@ export interface RulePayload {
 }
 
 export const getRuleList = () => {
-  return ruleRequests.get<RuleListResponse>("admin/rule/1");
+  return ruleRequest.get<RuleListResponse>("admin/rule/1");
 };
 
 export const createRule = (payload: RulePayload) => {
-  return ruleRequests.post("admin/rule", { ...payload });
+  return ruleRequest.post("admin/rule", { ...payload });
 };
 
 export const updateRule = (payload: RulePayload) => {
-  return ruleRequests.post("admin/rule/193", { ...payload });
+  return ruleRequest.post("admin/rule/193", { ...payload });
 };
 
 export const deleteRule = (id: number) => {
-  return ruleRequests.post(`admin/rule/${id}/delete`);
+  return ruleRequest.post(`admin/rule/${id}/delete`);
 };
 
 export const updateRuleStatus = (id: number, status: number) => {
-  return ruleRequests.post(`admin/rule/${id}/update_status`, { status });
+  return ruleRequest.post(`admin/rule/${id}/update_status`, { status });
+};
+
+export const setRules = (id: number, rule_ids: number[]) => {
+  return ruleRequest.post("admin/role/set_rules", { id, rule_ids });
 };
