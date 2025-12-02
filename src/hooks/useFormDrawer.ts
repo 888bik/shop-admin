@@ -66,7 +66,6 @@ export function useFormDrawer<T = any>(
     try {
       if (mode.value === "add" && apis?.createApi) {
         await apis.createApi(form);
-        console.log(form);
       } else if (mode.value === "edit" && apis?.updateApi && editData.value) {
         const id = editData.value["id"];
         // await apis.updateApi(id, form as T);
