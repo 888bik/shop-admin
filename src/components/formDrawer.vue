@@ -13,7 +13,15 @@
         <slot></slot>
       </div>
       <div class="bottom-btn">
-        <el-button @click="submit" type="primary">{{ confirmText }}</el-button>
+        <el-button
+          @click="submit"
+          type="primary"
+          :disabled="btnLoading"
+          v-loading="btnLoading"
+          class="submit-btn"
+        >
+          {{ confirmText }}
+        </el-button>
         <el-button @click="close" type="default">取消</el-button>
       </div>
     </div>
@@ -36,12 +44,14 @@ const props = withDefaults(
     confirmText?: string;
     destroyOnClose?: boolean;
     closeOnClickModal?: boolean;
+    btnLoading?: boolean;
   }>(),
   {
     size: "45%",
     confirmText: "提交",
     destroyOnClose: false,
     closeOnClickModal: false,
+    btnLoading: false,
   }
 );
 

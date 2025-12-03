@@ -23,7 +23,7 @@ export function useFormDrawer<T = any>(
   const form = reactive(formData ? { ...formData } : {});
   const formRef = ref<FormInstance | null>(null);
   const formDrawerRef = ref();
-  const loading = ref(false);
+  const formDrawerLoading = ref(false);
 
   const openAdd = (drawerTitle = "新增") => {
     mode.value = "add";
@@ -62,7 +62,7 @@ export function useFormDrawer<T = any>(
   const submit = async () => {
     if (!formRef.value) return;
     await formRef.value.validate();
-    loading.value = true;
+    formDrawerLoading.value = true;
     try {
       if (mode.value === "add" && apis?.createApi) {
         await apis.createApi(form);
@@ -78,9 +78,9 @@ export function useFormDrawer<T = any>(
       onSuccess && onSuccess();
       close();
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     } finally {
-      loading.value = false;
+      formDrawerLoading.value = false;
     }
   };
 
@@ -91,7 +91,7 @@ export function useFormDrawer<T = any>(
     title,
     mode,
     editData,
-    loading,
+    formDrawerLoading,
     openAdd,
     openEdit,
     openUpload,

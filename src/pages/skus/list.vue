@@ -1,6 +1,6 @@
 <template>
   <div class="skus-page">
-    <el-card shadow="never" class="border-0" v-loading="loading">
+    <el-card shadow="never" class="border-0">
       <list-header
         @refresh="getTableData"
         @add="openAdd"
@@ -11,7 +11,7 @@
         :data="tableData"
         stripe
         style="width: 100%"
-        v-loading="isLoading"
+        v-loading="tableLoading"
         ref="multipleTableRef"
         @selection-change="handleSelectionChange"
       >
@@ -114,8 +114,6 @@
 
 <script setup lang="ts">
 import ListHeader from "@/components/listHeader.vue";
-import { ref, watch } from "vue";
-import { toast } from "@/assets/base-ui/toast";
 import { useFormDrawer } from "@/hooks/useFormDrawer";
 import FormDrawer from "@/components/formDrawer.vue";
 import TagInput from "@/components/tagInput.vue";
@@ -127,14 +125,27 @@ import {
   updateSkusStatus,
   type ISkusItem,
 } from "@/services/modules/skus";
+import { useTable } from "@/hooks/useTable";
 
-const tableData = ref<ISkusItem[]>([]);
-
-const currentPage = ref(1);
-const totalCount = ref(0);
-const isLoading = ref(false);
-const multiSelectionIds = ref<number[]>([]);
-
+const {
+  tableData,
+  tableLoading,
+  currentPage,
+  totalCount,
+  query,
+  multiSelectionIds,
+  getTableData,
+  handleDelete,
+  handleChangeStatus,
+  handleSelectionChange,
+  handlePageChange,
+} = useTable<ISkusItem>({
+  listApi: (page, limit) => getSkusList(page),
+  deleteApi: deleteSkus,
+  updateStatusApi: updateSkusStatus,
+  pageSize: 10,
+  initialQuery: {},
+});
 const {
   visible,
   title,
@@ -144,7 +155,7 @@ const {
   rules,
   formDrawerRef,
   formRef,
-  loading,
+  formDrawerLoading,
   submit,
 } = useFormDrawer(
   {
@@ -164,45 +175,10 @@ const {
   () => getTableData()
 );
 
-const getTableData = async () => {
-  isLoading.value = true;
-
-  const res = await getSkusList(currentPage.value);
-  tableData.value = res.list;
-  totalCount.value = res.totalCount;
-
-  isLoading.value = false;
-};
-getTableData();
-
-const handleDelete = async (id?: number) => {
-  if (id) {
-    await deleteSkus(id);
-  } else if (multiSelectionIds.value) {
-    await deleteSkus(multiSelectionIds.value);
-  }
-  toast("删除成功");
+const init = async () => {
   getTableData();
 };
-
-const handleChangeStatus = async (id: number, status: number) => {
-  isLoading.value = true;
-  await updateSkusStatus(id, status);
-  toast("修改成功");
-  isLoading.value = false;
-};
-
-const handleSelectionChange = async (val: ISkusItem[]) => {
-  multiSelectionIds.value = val.map((o) => o.id);
-};
-
-const handlePageChange = (page: number) => {
-  currentPage.value = page;
-};
-
-watch(currentPage, () => {
-  getTableData();
-});
+init();
 </script>
 
 <style scoped></style>

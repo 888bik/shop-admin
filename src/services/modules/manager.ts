@@ -49,7 +49,7 @@ export const updateManager = (id: number, payload: UpdateManagerPayload) => {
   });
 };
 
-export const deleteManager = (id: number) => {
+export const deleteManager = (id: number | number[]) => {
   return managerRequest.post(`admin/manager/${id}/delete`);
 };
 

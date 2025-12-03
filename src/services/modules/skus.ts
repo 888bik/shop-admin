@@ -36,11 +36,7 @@ export const createSkus = (payload: createSkusPayload) => {
 
 export const deleteSkus = (ids: number | number[]) => {
   //统一转为一维数组
-  const arr = Array.isArray(ids)
-    ? ids
-    : ids !== undefined && ids !== null
-    ? [ids]
-    : [];
+  const arr = Array.isArray(ids) ? ids : [ids];
   return skusRequest.post("admin/skus/delete_all", { ids: arr });
 };
 

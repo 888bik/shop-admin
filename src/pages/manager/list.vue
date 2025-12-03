@@ -1,14 +1,14 @@
 <template>
   <div class="manager-page">
     <el-card shadow="never" class="border-0">
-      <SearchInput v-model="keyword" @search="getTableData" />
+      <SearchInput v-model="keyword" @search="onSearch" />
       <ListHeader @refresh="getTableData" @add="openAdd" />
 
       <el-table
         :data="tableData"
         stripe
         style="width: 100%"
-        v-loading="loading"
+        v-loading="tableLoading"
       >
         <el-table-column prop="username" label="管理员">
           <template #default="scope">
@@ -172,18 +172,33 @@ import {
   updateManagerStatus,
 } from "@/services/modules/manager";
 import FormDrawer from "@/components/formDrawer.vue";
-import { toast } from "@/assets/base-ui/toast";
+import { useTable } from "@/hooks/useTable";
 
-const { dialogVisible, imageUrl, openSelector, handleSelect } =
-  useImageSelector();
+const { dialogVisible, imageUrl, handleSelect } = useImageSelector();
 
 const roles = ref<IRole[]>();
-const tableData = ref<IManagerItem[]>([]);
-const currentPage = ref(1);
-const totalCount = ref(0);
-const limit = ref(10);
 const keyword = ref("");
+watch(keyword, (v) => {
+  query.value.keyword = v; // 更新 query
+});
 
+const {
+  tableData,
+  tableLoading,
+  currentPage,
+  totalCount,
+  query,
+  getTableData,
+  handleDelete,
+  handleChangeStatus,
+  handlePageChange,
+} = useTable<IManagerItem>({
+  listApi: (page, limit) => getManagerList(page, limit, keyword.value),
+  deleteApi: deleteManager,
+  updateStatusApi: updateManagerStatus,
+  pageSize: 10,
+  initialQuery: {}, // 如果有搜索参数放这里
+});
 const {
   visible,
   title,
@@ -194,7 +209,7 @@ const {
   submit,
   formRef,
   formDrawerRef,
-  loading,
+  formDrawerLoading,
 } = useFormDrawer(
   {
     username: [{ required: true, message: "用户名不能为空" }],
@@ -217,35 +232,16 @@ const {
   () => getTableData()
 );
 
-const getTableData = async () => {
-  loading.value = true;
-  const res = await getManagerList(
-    currentPage.value,
-    limit.value,
-    keyword.value
-  );
+const init = async () => {
+  const res = await getTableData();
 
-  tableData.value = res.list;
-  totalCount.value = res.totalCount;
-  roles.value = res.roles;
-
-  loading.value = false;
+  roles.value = res.roles ?? [];
 };
-getTableData();
+init();
 
-const handleDelete = async (id: number) => {
-  loading.value = true;
-  await deleteManager(id);
-  toast("删除成功");
-  loading.value = false;
-  getTableData();
-};
-
-const handleChangeStatus = async (id: number, status: number) => {
-  loading.value = true;
-  await updateManagerStatus(id, status);
-  toast("修改成功");
-  loading.value = false;
+const onSearch = (kw: string) => {
+  query.value.keyword = kw;
+  getTableData(1);
 };
 
 watch(imageUrl, (val) => {
@@ -260,13 +256,10 @@ watch(
     form.roleId = val;
   }
 );
-const handlePageChange = (page: number) => {
-  currentPage.value = page;
-};
 
-watch(currentPage, () => {
-  getTableData();
-});
+// watch(currentPage, () => {
+//   getTableData();
+// });
 </script>
 
 <style scoped>
