@@ -7,8 +7,8 @@ export interface ISkusItem {
   status: number;
   type: number;
   defaults: string;
-  create_time: string;
-  update_time: string;
+  createTime: string;
+  updateTime: string;
 }
 
 interface SkusPayload {

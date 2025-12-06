@@ -15,7 +15,7 @@
         label-name="商品分类"
       >
         <el-select
-          v-model="searchQuery.category_id"
+          v-model="searchQuery.categoryId"
           placeholder="请选择商品分类"
           clearable
         >
@@ -83,7 +83,7 @@
                   分类:{{ row.category ? row.category.name : "未分类" }}
                 </p>
                 <p class="text-gray-400 text-xs">
-                  创建时间：{{ row.createTime }}
+                  创建时间：{{ timeUtils.format(row.createTime) }}
                 </p>
               </div>
             </div>
@@ -94,7 +94,7 @@
           label="实际销量"
           align="center"
           width="80"
-          prop="sale_count"
+          prop="saleCount"
         />
 
         <el-table-column label="商品状态" align="center" width="100">
@@ -138,7 +138,13 @@
                 @click="handleSetGoodsBanner(row)"
                 >设置轮播图</el-button
               >
-              <el-button type="primary" size="small" text>商品详情</el-button>
+              <el-button
+                size="small"
+                text
+                :type="row.content === null ? 'danger' : 'primary'"
+                @click="handleGoodsDetail(row.id)"
+                >商品详情</el-button
+              >
               <el-button
                 type="primary"
                 size="small"
@@ -184,7 +190,7 @@
         </el-form-item>
 
         <el-form-item label="封面" prop="cover">
-          <ImageSelect showTrigger :multiple="false" v-model="form.cover" />
+          <ImageSelect :multiple="false" v-model="form.cover" />
         </el-form-item>
 
         <el-form-item label="商品分类" prop="categoryId">
@@ -202,9 +208,9 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="商品描述" prop="desc">
+        <el-form-item label="商品描述" prop="description">
           <el-input
-            v-model="form.desc"
+            v-model="form.description"
             placeholder="选填，商品卖点"
             type="textarea"
             :rows="3"
@@ -253,7 +259,7 @@
     </form-drawer>
 
     <Banner ref="bannerRef" @reload-data="getTableData" />
-    <!-- <Content ref="contentRef" @reload-data="getTableData" /> -->
+    <Content ref="contentRef" @reload-data="getTableData" />
   </div>
 </template>
 
@@ -276,16 +282,18 @@ import { toast } from "@/assets/base-ui/toast";
 import ImageSelect from "@/components/imageSelect.vue";
 import Banner from "./banners.vue";
 import Content from "./content.vue";
+import { timeUtils } from "@/utils/date";
 
 const searchQuery = reactive({
   tab: "all",
   title: "",
-  category_id: null,
+  categoryId: null,
 });
 
 const categoryList = ref<IGoodsCategory[]>([]);
 
 const bannerRef = ref();
+const contentRef = ref();
 
 const {
   tableData,
@@ -325,13 +333,13 @@ const {
   {
     title: [{ required: true, message: "商品名称不能为空" }],
     cover: [{ required: true, message: "请选择封面" }],
-    category_id: [{ required: true, message: "请选择商品分类" }],
+    categoryId: [{ required: true, message: "请选择商品分类" }],
   },
   {
     title: null, //商品名称
     categoryId: null, //商品分类
     cover: null, //商品封面
-    desc: null, //商品描述
+    description: null, //商品描述
     unit: "件", //商品单位
     stock: 100, //总库存
     minStock: 10, //库存预警
@@ -356,7 +364,7 @@ watch(
 );
 
 watch(
-  () => searchQuery.category_id,
+  () => searchQuery.categoryId,
   (v) => {
     console.log(v);
     query.value.categoryId = v;
@@ -384,6 +392,10 @@ const handleMultiStatusChange = async (status: number) => {
 
 const handleSetGoodsBanner = (row: any) => {
   bannerRef.value.open(row.id);
+};
+
+const handleGoodsDetail = (id: number) => {
+  contentRef.value?.open(id);
 };
 
 const tabBarData = [

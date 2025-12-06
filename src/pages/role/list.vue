@@ -1,6 +1,6 @@
 <template>
   <div class="role-page">
-    <el-card shadow="never" class="border-0" v-loading="loading">
+    <el-card shadow="never" class="border-0" v-loading="formDrawerLoading">
       <list-header @refresh="getTableData" @add="openAdd" />
       <el-table
         :data="tableData"
@@ -20,7 +20,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="desc" label="角色描述" align="center" />
+        <el-table-column prop="description" label="角色描述" align="center" />
         <el-table-column prop="status" label="状态" align="center">
           <template #default="scope">
             <el-switch
@@ -87,9 +87,9 @@
         <el-form-item label="角色名称" prop="name">
           <el-input v-model="form.name" placeholder="角色名称"></el-input>
         </el-form-item>
-        <el-form-item label="角色描述" prop="desc">
+        <el-form-item label="角色描述" prop="description">
           <el-input
-            v-model="form.desc"
+            v-model="form.description"
             placeholder="角色描述"
             type="textarea"
             :rows="5"
@@ -178,7 +178,7 @@ const {
   rules,
   formDrawerRef,
   formRef,
-  loading,
+  formDrawerLoading,
   submit,
 } = useFormDrawer(
   {
@@ -244,12 +244,12 @@ const openSetRule = async (row: IRoleItem) => {
 };
 
 const handleSetRuleSubmit = async () => {
-  loading.value = true;
+  formDrawerLoading.value = true;
   await setRules(roleId.value, ruleIds.value);
   toast("修改成功");
   getTableData();
 
-  loading.value = false;
+  formDrawerLoading.value = false;
   showRulesDrawer.value = false;
 };
 

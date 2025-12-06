@@ -150,9 +150,9 @@
           />
         </el-form-item>
 
-        <el-form-item label="描述" prop="desc">
+        <el-form-item label="描述" prop="description">
           <el-input
-            v-model="form.desc"
+            v-model="form.description"
             placeholder="优惠券描述"
             type="textarea"
             :rows="5"

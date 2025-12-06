@@ -13,9 +13,9 @@ export interface IRoleItem {
   id: number;
   name: string;
   status: number;
-  create_time: string;
-  update_time: string;
-  desc: string;
+  createTime: string;
+  updateTime: string;
+  description: string;
   rules: IRuleItem[];
 }
 
@@ -27,7 +27,7 @@ export interface RoleListResponse {
 interface RolePayload {
   name: string;
   status: number;
-  desc: string;
+  description: string;
 }
 
 interface createRolePayload extends RolePayload {}

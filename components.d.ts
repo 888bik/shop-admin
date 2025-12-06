@@ -80,6 +80,7 @@ declare module 'vue' {
     ImagePicker: typeof import('./src/components/imagePicker.vue')['default']
     ImageSelect: typeof import('./src/components/imageSelect.vue')['default']
     ListHeader: typeof import('./src/components/listHeader.vue')['default']
+    RichEditor: typeof import('./src/components/RichEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./src/components/searchBar.vue')['default']

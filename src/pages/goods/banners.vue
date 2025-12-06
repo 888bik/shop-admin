@@ -8,7 +8,7 @@
     >
       <el-form :model="form" label-width="80px">
         <el-form-item label="轮播图">
-          <ImageSelect v-model="form.banners" showTrigger :multiple="true" />
+          <ImageSelect v-model="form.banners" :multiple="true" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submit" :loading="loading"

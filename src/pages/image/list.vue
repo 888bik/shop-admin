@@ -18,7 +18,7 @@
           ref="imageContentRef"
           :category-id="categoryId"
           :enable-preview="enablePreview"
-          :selectable="true"
+          :selectable="isSelectable"
           :multiple="multiple"
           @select="handleSelect"
         />
@@ -90,10 +90,20 @@ import {
 import { toast } from "@/assets/base-ui/toast";
 import FormDrawer from "@/components/formDrawer.vue";
 
-const props = defineProps({
-  enablePreview: { type: Boolean, default: true },
-  multiple: { type: Boolean, default: false },
-});
+interface IProps {
+  //开启预览,图库模块正常模式开启
+  enablePreview?: boolean;
+  //选择模式
+  isSelectable?: boolean;
+  //在选择模式下是否开启多选模式
+  multiple?: boolean;
+}
+
+const {
+  enablePreview = true,
+  multiple = false,
+  isSelectable = false,
+} = defineProps<IProps>();
 
 const emit = defineEmits(["select"]);
 

@@ -5,7 +5,7 @@ export interface MenuItem {
   createTime: string;
   updateTime: string;
   name: string;
-  desc: string;
+  description: string;
   frontpath: any;
   condition: any;
   menu: number;

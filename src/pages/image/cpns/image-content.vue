@@ -8,10 +8,7 @@
           :key="item.id"
           class="mt-3"
         >
-          <div
-            class="relative group card-wrapper"
-            :class="{ selected: selectedIds.includes(item.id) }"
-          >
+          <div class="relative group card-wrapper">
             <!-- 注意：不要使用 .stop，这样 enablePreview 为 true 的时候 el-image 自带预览可工作 -->
             <el-image
               class="card-cover w-full h-38 object-cover cursor-pointer"
@@ -21,7 +18,7 @@
               @click="onCardClick(item)"
             />
 
-            <!-- 悬浮图标按钮（保持原有功能） -->
+            <!-- 悬浮图标按钮 -->
             <div
               class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition duration-200"
             >
@@ -42,7 +39,7 @@
             </div>
 
             <!-- 选择标记（勾）-->
-            <div
+            <!-- <div
               v-if="selectable"
               class="select-badge absolute left-2 top-2 opacity-0 group-hover:opacity-100 transition"
             >
@@ -53,10 +50,13 @@
               >
                 <Check />
               </el-icon>
-            </div>
+            </div> -->
 
             <!-- 选中遮罩（始终显示当已选中） -->
-            <div v-if="selectedIds.includes(item.id)" class="selected-overlay">
+            <div
+              v-if="selectedIds.includes(item.id) && !enablePreview"
+              class="selected-overlay"
+            >
               <div class="checkmark">
                 <el-icon><Check /></el-icon>
               </div>
@@ -92,10 +92,16 @@ import type { IImageItem, IImageList } from "../type";
 import { openMessageBox } from "@/assets/base-ui/messageBox";
 import { toast } from "@/assets/base-ui/toast";
 
+interface IProps {
+  enablePreview: boolean;
+  categoryId: number;
+  multiple: boolean;
+  initialSelectedIds: any;
+}
+
 const props = defineProps({
   enablePreview: { type: Boolean, default: true },
   categoryId: { type: Number, default: 0 },
-  // 新增选择相关 props
   selectable: { type: Boolean, default: false },
   multiple: { type: Boolean, default: false },
   // 可传入初始已选 ids（可选）
@@ -113,14 +119,21 @@ const totalCount = ref<number>(0);
 
 // 用来保存当前分类 ID
 const localCategoryId = ref<number | null>(0);
+// 跨分类保存选中状态
+// const selectedMap = ref<Record<number, IImageItem>>({});
 
-// 选中 id 列表
+// 当前分类选中列表，界面绑定
 const selectedIds = ref<number[]>([...props.initialSelectedIds]);
 
+const selectedItemsAll = ref<IImageItem[]>([]);
+
 const loadImageList = async (id?: number) => {
-  if (id) {
+  if (id != undefined) {
     localCategoryId.value = id; //缓存id
     currentPage.value = 1; //切换分页从第一页开始加载
+
+    // 切换分类时恢复该分类已选
+    // selectedIds.value = selectedMap.value[id] ? [...selectedMap.value[id]] : [];
   }
 
   if (!localCategoryId.value) {
@@ -155,8 +168,7 @@ watch(
     loadImageList(newId);
   }
 );
-
-// 当父级传入 initialSelectedIds 时，初始化 selectedIds
+// 父组件传入 initialSelectedIds 时同步
 watch(
   () => props.initialSelectedIds,
   (ids) => {
@@ -171,11 +183,10 @@ const handlePageChange = (page: number) => {
 
 const handleEditImageName = async (id: number) => {
   try {
-    const NewName = await openMessageBox();
-    if (!NewName) return;
-    await updateImageName(id, NewName);
+    const newName = await openMessageBox();
+    if (!newName) return;
+    await updateImageName(id, newName);
     toast("修改成功");
-    //重新加载
     loadImageList();
     emit("editSuccess", id);
   } catch (error) {
@@ -195,18 +206,17 @@ const handleDeleteImage = async (id: number) => {
   }
 };
 
-// 点击图片卡片（入口）
+// 点击图片卡片
 const onCardClick = (item: IImageItem) => {
   // 如果处于可选择模式，走选择逻辑
   if (props.selectable) {
     toggleSelect(item);
     return;
   }
-
   // 非选择模式：
   // 如果 enablePreview 为 false，则作为单次选择，直接 emit select
   if (!props.enablePreview) {
-    emit("select", item);
+    emit("select", item.url);
     return;
   }
 
@@ -216,18 +226,45 @@ const onCardClick = (item: IImageItem) => {
 
 // 切换选择（用于勾选 icon 或点击卡片时）
 const toggleSelect = (item: IImageItem) => {
+  //选中的图片id
   const idx = selectedIds.value.indexOf(item.id);
 
   // 多选模式
   if (props.multiple) {
-    if (idx === -1) selectedIds.value.push(item.id);
-    else selectedIds.value.splice(idx, 1);
+    if (idx === -1) {
+      selectedIds.value.push(item.id);
 
-    // === 关键：组装并 emit 选中的图片对象数组 ===
-    const selectedItems = ImageListData.value.filter((img) =>
-      selectedIds.value.includes(img.id)
-    );
-    emit("select", selectedItems);
+      if (!selectedItemsAll.value.find((img) => img.id === item.id)) {
+        selectedItemsAll.value.push(item);
+      }
+    } else {
+      selectedIds.value.splice(idx, 1);
+
+      const removeIndex = selectedItemsAll.value.findIndex(
+        (img) => img.id === item.id
+      );
+      if (removeIndex !== -1) {
+        selectedItemsAll.value.splice(removeIndex, 1);
+      }
+    }
+    // 更新跨分类 Map
+    // selectedMap.value[cid] = [...selectedIds.value];
+
+    // 组装并 emit 选中的图片对象数组
+    // const selectedItems = ImageListData.value.filter((img) =>
+    //   selectedIds.value.includes(img.id)
+    // );
+    // selectedMap.value[cid] = ImageListData.value.filter((img) => {
+    //   return selectedIds.value.includes(img.id);
+    // });
+
+    // emit("select", selectedItems);
+    // return;
+
+    // const selectedItems = ImageListData.value.filter((img) =>
+    //   selectedIds.value.includes(img.id)
+    // );
+    emit("select", selectedItemsAll.value);
     return;
   }
 
@@ -235,17 +272,18 @@ const toggleSelect = (item: IImageItem) => {
   if (idx === -1) selectedIds.value = [item.id];
   else selectedIds.value = [];
 
+  // selectedMap.value[cid] = [...selectedIds.value];
+
   const selectedItem = ImageListData.value.find((img) =>
     selectedIds.value.includes(img.id)
   );
-  console.log(selectedItem);
-  emit("select", selectedItem ?? null);
+  emit("select", selectedItem?.url ?? null);
 };
 
 defineExpose({
   loadImageList,
-  // 让外部可以读取或设置 selectedIds 如果需要
   selectedIds,
+  // selectedMap,
 });
 </script>
 

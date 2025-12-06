@@ -108,7 +108,7 @@ export interface IGoodsListItem {
   reviewCount: number;
   minPrice: string; // 注意：后端是字符串 "1.00"
   minOprice: string; // 原数据有 min_oprice
-  desc: string;
+  description: string;
   unit: string;
   stock: number;
   minStock: number;
@@ -142,7 +142,7 @@ export interface GoodsPayload {
   title: string;
   categoryId: number;
   cover: string;
-  desc: string;
+  description: string;
   unit: string;
   stock: number;
   minStock: number;
@@ -160,8 +160,8 @@ export const getGoodsList = (
   page: number = 1,
   payload: GetGoodsListPayload
 ) => {
-  return goodsRequest.get(`admin/goods/${page}`, {
-    params: { ...payload },
+  return goodsRequest.get<GoodsListResponse>(`admin/goods/${page}`, {
+    params: payload,
   });
 };
 
@@ -178,11 +178,6 @@ export const updateGoodsStatus = (ids: number | number[], status: number) => {
 export const createGoods = (payload: CreateGoodsPayload) => {
   return goodsRequest.post("admin/goods", {
     ...payload,
-    category_id: payload.categoryId,
-    min_stock: payload.minStock,
-    stock_display: payload.stockDisplay,
-    minPrice: payload.minPrice,
-    min_oprice: payload.minOprice,
   });
 };
 
@@ -196,4 +191,8 @@ export const readGoods = (id: number) => {
 
 export const updateGoodsBanners = (id: number, banners: string[]) => {
   return goodsRequest.post(`admin/goods/banners/${id}`, { banners });
+};
+
+export const updateGoodsContent = (id: number, content: string) => {
+  return goodsRequest.post(`admin/goods/updateContent/${id}`, { content });
 };

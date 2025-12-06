@@ -8,9 +8,9 @@ export interface IRuleItem {
   order: number; //排序
   ruleId: number; //上级菜单id
   status: number;
-  create_time: string;
-  update_time: string;
-  desc: string;
+  createTime: string;
+  updateTime: string;
+  description: string;
   frontpath: string;
   icon: string;
   condition: any;

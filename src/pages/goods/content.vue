@@ -8,7 +8,7 @@
   >
     <el-form :model="form">
       <el-form-item>
-        <Editor v-model="form.content" />
+        <RichEditor v-model="form.content" />
       </el-form-item>
     </el-form>
   </FormDrawer>
@@ -16,12 +16,13 @@
 
 <script setup lang="ts">
 import { toast } from "@/assets/base-ui/toast";
-import Editor from "@/components/Editor.vue";
+import RichEditor from "@/components/RichEditor.vue";
 import FormDrawer from "@/components/formDrawer.vue";
-import { readGoods, updateGoods } from "@/services/modules/goods";
+import { readGoods, updateGoodsContent } from "@/services/modules/goods";
 import { reactive, ref } from "vue";
 
 const formDrawerRef = ref();
+
 const visible = ref(false);
 
 const form = reactive({
@@ -29,31 +30,24 @@ const form = reactive({
 });
 
 const goodsId = ref(0);
-const open = (row: any) => {
-  goodsId.value = row.id;
-  row.contentLoading = true;
-  readGoods(goodsId.value)
-    .then((res) => {
-      form.content = res.content;
-      formDrawerRef.value.open();
-    })
-    .finally(() => {
-      row.contentLoading = false;
-    });
+
+const open = async (id: number) => {
+  goodsId.value = id;
+  const res = await readGoods(goodsId.value);
+  form.content = res.content;
+  visible.value = true;
 };
+
 const emit = defineEmits(["reloadData"]);
 
-const submit = () => {
-  visible.value = true;
-  updateGoods(goodsId.value, form)
-    .then((res) => {
-      toast("设置商品详情成功");
-      formDrawerRef.value.close();
-      emit("reloadData");
-    })
-    .finally(() => {
-      visible.value = false;
-    });
+const submit = async () => {
+  console.log("1111");
+  await updateGoodsContent(goodsId.value, form.content);
+
+  toast("设置商品详情成功");
+  emit("reloadData");
+
+  visible.value = false;
 };
 
 defineExpose({
