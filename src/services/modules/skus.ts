@@ -6,7 +6,7 @@ export interface ISkusItem {
   order: number;
   status: number;
   type: number;
-  default: string;
+  defaults: string;
   create_time: string;
   update_time: string;
 }
@@ -15,7 +15,7 @@ interface SkusPayload {
   name: string;
   order: number;
   status: number;
-  default: string;
+  defaults: string;
 }
 
 interface createSkusPayload extends SkusPayload {}
@@ -41,6 +41,7 @@ export const deleteSkus = (ids: number | number[]) => {
 };
 
 export const updateSkus = (id: number, payload: updateSkusPayload) => {
+  console.log(payload, "1111111");
   return skusRequest.post(`admin/skus/${id}`, { ...payload });
 };
 

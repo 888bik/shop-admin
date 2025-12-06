@@ -12,7 +12,7 @@
       <div class="body">
         <slot></slot>
       </div>
-      <div class="bottom-btn">
+      <div class="bottom-btn" v-if="!hideBtn">
         <el-button
           @click="submit"
           type="primary"
@@ -45,6 +45,7 @@ const props = withDefaults(
     destroyOnClose?: boolean;
     closeOnClickModal?: boolean;
     btnLoading?: boolean;
+    hideBtn?: boolean;
   }>(),
   {
     size: "45%",
@@ -52,6 +53,7 @@ const props = withDefaults(
     destroyOnClose: false,
     closeOnClickModal: false,
     btnLoading: false,
+    hideBtn: false,
   }
 );
 

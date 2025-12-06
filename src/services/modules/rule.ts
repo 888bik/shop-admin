@@ -6,7 +6,7 @@ export interface IRuleItem {
   method: "GET" | "POST" | "DELETE" | "PUT";
   name: string; //菜单权限名称
   order: number; //排序
-  rule_id: number; //上级菜单id
+  ruleId: number; //上级菜单id
   status: number;
   create_time: string;
   update_time: string;
@@ -24,7 +24,7 @@ export interface RuleListResponse {
 }
 
 export interface RulePayload {
-  rule_id: number;
+  ruleId: number;
   menu: number;
   name: string;
   condition: string;
@@ -43,8 +43,8 @@ export const createRule = (payload: RulePayload) => {
   return ruleRequest.post("admin/rule", { ...payload });
 };
 
-export const updateRule = (payload: RulePayload) => {
-  return ruleRequest.post("admin/rule/193", { ...payload });
+export const updateRule = (id: number, payload: RulePayload) => {
+  return ruleRequest.post(`admin/rule/${id}`, { ...payload });
 };
 
 export const deleteRule = (id: number) => {

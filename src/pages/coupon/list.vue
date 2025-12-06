@@ -1,6 +1,6 @@
 <template>
   <div class="role-page">
-    <el-card shadow="never" class="border-0" v-loading="loading">
+    <el-card shadow="never" class="border-0" v-loading="formDrawerLoading">
       <list-header @refresh="getTableData" @add="openAdd" />
       <el-table
         :data="tableData"
@@ -15,7 +15,10 @@
               :class="row.statusText == '领取中' ? 'active' : 'inactive'"
             >
               <h5 class="font-bold text-md">{{ row.name }}</h5>
-              <small>{{ row.start_time }} ~ {{ row.end_time }}</small>
+              <small
+                >{{ timeUtils.format(row.startTime) }} ~
+                {{ timeUtils.format(row.endTime) }}</small
+              >
             </div>
           </template>
         </el-table-column>
@@ -119,9 +122,9 @@
           ></el-input-number>
         </el-form-item>
 
-        <el-form-item label="最低使用价格" prop="min_price">
+        <el-form-item label="最低使用价格" prop="minPrice">
           <el-input
-            v-model="form.min_price"
+            v-model="form.minPrice"
             placeholder="最低使用价格"
             type="number"
           ></el-input>
@@ -150,7 +153,7 @@
         <el-form-item label="描述" prop="desc">
           <el-input
             v-model="form.desc"
-            placeholder="角色描述"
+            placeholder="优惠券描述"
             type="textarea"
             :rows="5"
           ></el-input>
@@ -162,7 +165,7 @@
 
 <script setup lang="ts">
 import ListHeader from "@/components/listHeader.vue";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { toast } from "@/assets/base-ui/toast";
 
 import { useFormDrawer } from "@/hooks/useFormDrawer";
@@ -176,6 +179,7 @@ import {
   type ICouponItem,
 } from "@/services/modules/coupon";
 import { dayjs } from "element-plus";
+import { timeUtils } from "@/utils/date";
 
 const tableData = ref<ICouponItem[]>([]);
 const currentPage = ref(1);
@@ -193,7 +197,7 @@ const {
   rules,
   formDrawerRef,
   formRef,
-  loading,
+  formDrawerLoading,
   submit,
 } = useFormDrawer(
   {
@@ -204,9 +208,9 @@ const {
     type: 0,
     value: 0,
     total: 100,
-    min_price: 0,
-    start_time: "",
-    end_time: "",
+    minPrice: 0,
+    startTime: "",
+    endTime: "",
     order: 50,
     desc: "",
   },
@@ -219,12 +223,12 @@ const {
 
 function formatStatus(row: any) {
   let s = "领取中";
-  let start_time = new Date(row.start_time).getTime();
-  let now = new Date().getTime();
-  let end_time = new Date(row.end_time).getTime();
-  if (start_time > now) {
+  const now = timeUtils.now(); // 当前秒级时间戳
+  let startTime = new Date(row.startTime).getTime();
+  let endTime = new Date(row.endTime).getTime();
+  if (startTime > now) {
     s = "未开始";
-  } else if (end_time < now) {
+  } else if (endTime < now) {
     s = "已结束";
   } else if (row.status == 0) {
     s = "已失效";
@@ -247,13 +251,13 @@ const getTableData = async () => {
 getTableData();
 
 const submitCoupon = () => {
-  //将日期转为时间戳
+  //将日期转为妙极时间戳
   if (timerange.value?.length === 2) {
-    form.start_time = new Date(timerange.value[0]).getTime();
-    form.end_time = new Date(timerange.value[1]).getTime();
+    form.startTime = timeUtils.toUnix(timerange.value[0]);
+    form.endTime = timeUtils.toUnix(timerange.value[1]);
   } else {
-    form.start_time = "";
-    form.end_time = "";
+    form.startTime = 0;
+    form.endTime = 0;
   }
 
   submit();
@@ -262,8 +266,8 @@ const submitCoupon = () => {
 const handleEdit = (row: ICouponItem) => {
   //将时间戳转为日期回填
   timerange.value = [
-    row.start_time ? dayjs(row.start_time).format("YYYY-MM-DD HH:mm:ss") : "",
-    row.end_time ? dayjs(row.end_time).format("YYYY-MM-DD HH:mm:ss") : "",
+    row.startTime ? dayjs(row.startTime).format("YYYY-MM-DD HH:mm:ss") : "",
+    row.endTime ? dayjs(row.endTime).format("YYYY-MM-DD HH:mm:ss") : "",
   ];
 
   openEdit(row);

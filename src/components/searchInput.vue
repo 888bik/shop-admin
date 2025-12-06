@@ -1,21 +1,27 @@
 <template>
   <div class="search-box">
-    <div>
-      <span class="text-gray-400 mr-3">关键词</span>
-      <el-input
-        v-model="keyword"
-        placeholder="请输入关键词搜索"
-        clearable
-        @keyup.enter="onSearch"
-        style="width: 220px"
-        class="search-input"
-      >
-        <template #prefix>
-          <el-icon><Search /></el-icon>
-        </template>
-      </el-input>
+    <div class="search-input-left flex items-center gap-4">
+      <div class="field">
+        <span class="text-gray-400 mr-3">关键词</span>
+        <el-input
+          v-model="keyword"
+          placeholder="请输入关键词搜索"
+          clearable
+          @keyup.enter="onSearch"
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+        </el-input>
+      </div>
+
+      <div class="field">
+        <span class="text-gray-400 mr-3">{{ labelName }}</span>
+        <slot> </slot>
+      </div>
     </div>
-    <div>
+
+    <div class="search-input-right">
       <el-button type="primary" class="ml-2" @click="onSearch" size="small">
         <el-icon class="mr-1"><Search /></el-icon> 搜索
       </el-button>
@@ -31,11 +37,31 @@ import { ref, watch } from "vue";
 
 const props = defineProps<{
   modelValue: string;
+  labelName?: string;
 }>();
 
 const emit = defineEmits(["update:modelValue", "search"]);
 
 const keyword = ref(props.modelValue);
+
+// const fields = [
+//   {
+//     type: "input",
+//     label: "关键词",
+//     model: "keyword",
+//     placeholder: "请输入关键词",
+//     prefixIcon: Search,
+//   },
+//   {
+//     type: "select",
+//     label: "分类",
+//     model: "category_id",
+//     placeholder: "请选择分类",
+//     prefixIcon: Select,
+//     options: categoryList,
+//   },
+//   { type: "date", label: "创建时间", model: "date" },
+// ];
 
 // 父组件更新时同步
 watch(
@@ -65,23 +91,15 @@ const onReset = () => {
   padding: 12px;
 }
 
-.search-input {
-  width: 250px;
+.field {
+  display: flex;
+  width: 220px; /* 搜索框和下拉框同宽 */
+  align-items: center;
+  margin-right: 20px;
 }
 
-.search-input :deep(.el-input__wrapper) {
-  border-radius: 6px;
-  box-shadow: none !important;
-  border: 1px solid #dcdfe6;
-  transition: all 0.2s;
-}
-
-.search-input :deep(.el-input__wrapper:hover) {
-  border-color: #a8abb2;
-}
-
-.search-input :deep(.el-input__wrapper.is-focus) {
-  border-color: var(--el-color-primary);
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15);
+.field :deep(.el-input),
+.field :deep(.el-select) {
+  flex: 1;
 }
 </style>

@@ -1,22 +1,33 @@
 import { imageRequest } from "..";
 
-export const getImageCategory = (page: number = 1, limit: number = 10) => {
+export interface ImageCategoryPayload {
+  name: string;
+  order: number;
+}
+
+export interface CreateImageCategoryPayload extends ImageCategoryPayload {}
+export interface UpdateImageCategoryPayload extends ImageCategoryPayload {}
+
+export const getImageCategoryList = (page: number = 1, limit: number = 10) => {
   return imageRequest.get(`admin/image_class/${page}`, { params: { limit } });
 };
 
-export const addImageCategory = (name: string, order: number) => {
-  return imageRequest.post("admin/image_class", { name, order });
+export const createImageCategory = (payload: CreateImageCategoryPayload) => {
+  return imageRequest.post("admin/image_class", { ...payload });
 };
 
-export const editImageCategory = (id: number, name: string, order: number) => {
-  return imageRequest.post(`admin/image_class/${id}`, { name, order });
+export const updateImageCategory = (
+  id: number,
+  payload: UpdateImageCategoryPayload
+) => {
+  return imageRequest.post(`admin/image_class/${id}`, { ...payload });
 };
 
 export const deleteImageCategory = (id: number) => {
   return imageRequest.post(`admin/image_class/${id}/delete`);
 };
 
-export const getImageListById = (
+export const getImageList = (
   categoryId: number,
   currentPage: number,
   limit: number = 10
@@ -27,14 +38,14 @@ export const getImageListById = (
   );
 };
 
-export const deleteImageById = (ids: any[]) => {
+export const deleteImage = (ids: any[]) => {
   return imageRequest.post("admin/image/delete_all", { ids });
 };
 
 // 数据格式：普通对象 → Axios 会自动 JSON.stringify()
 // Content-Type：默认 application/json;charset=UTF-8
 // 适用场景：提交结构化数据
-export const editImageNameById = (id: number, name: string) => {
+export const updateImageName = (id: number, name: string) => {
   return imageRequest.post(`admin/image/${id}`, { name });
 };
 

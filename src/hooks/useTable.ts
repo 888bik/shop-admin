@@ -1,5 +1,5 @@
 import { toast } from "@/assets/base-ui/toast";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 
 export type ListApi<T> = (
   page: number,

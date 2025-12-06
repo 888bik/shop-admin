@@ -5,7 +5,7 @@ interface IRuleItem {
   pivot: {
     id: number;
     role_id: number;
-    rule_id: number;
+    ruleId: number;
   };
 }
 

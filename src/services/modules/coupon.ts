@@ -10,9 +10,9 @@ export interface ICouponItem {
   used: number;
   value: number;
   desc: string;
-  min_price: number;
-  start_time: string;
-  end_time: string;
+  minPrice: number;
+  startTime: string;
+  endTime: string;
   create_time: string;
   update_time: string;
   statusText?: string;
@@ -27,9 +27,9 @@ interface CouponPayload {
   type: number;
   value: number;
   total: number;
-  min_price: number;
-  start_time: string;
-  end_time: string;
+  minPrice: number;
+  startTime: string;
+  endTime: string;
   order: number;
   desc: string;
 }

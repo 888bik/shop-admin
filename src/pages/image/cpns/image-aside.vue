@@ -17,7 +17,7 @@
             text
             type="primary"
             size="small"
-            @click.stop="handleEditCategory"
+            @click.stop="handleEditCategory(item)"
           >
             <el-icon :size="12"><Edit /></el-icon>
           </el-button>
@@ -49,20 +49,17 @@
 <script setup lang="ts">
 import {
   deleteImageCategory,
-  getImageCategory,
+  getImageCategoryList,
 } from "@/services/modules/image";
 import { ref } from "vue";
 import type { ICategoryItem, IImageCategory, IImageList } from "../type";
 import { toast } from "@/assets/base-ui/toast";
-import { useFormDrawer } from "@/hooks/useFormDrawer";
 
 const emit = defineEmits<{
   (e: "changeCategory", id: number): void;
-  (e: "editCategory", data: ICategoryItem): void;
+  (e: "editCategory", data: any): void;
   (e: "deleteCategory", id: number): void;
 }>();
-
-const { openEdit } = useFormDrawer<ICategoryItem>();
 
 const imageCategoryData = ref<ICategoryItem[]>([]);
 
@@ -84,13 +81,14 @@ const handleSelected = (id: number) => {
 };
 
 const handleEditCategory = (item: ICategoryItem) => {
-  emit("editCategory", item);
+  const { id, name, order } = item;
+  emit("editCategory", { id, name, order });
 };
 
 const loadCategoryList = async (page = currentPage.value) => {
   isLoading.value = true;
   try {
-    const res: IImageCategory = await getImageCategory(page, limit.value);
+    const res: IImageCategory = await getImageCategoryList(page, limit.value);
     imageCategoryData.value = res.list;
     totalCount.value = res.totalCount;
     currentPage.value = page;

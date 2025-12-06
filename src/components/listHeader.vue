@@ -15,6 +15,7 @@
         v-if="layout.includes('delete')"
         >批量删除</el-button
       >
+      <slot />
     </div>
     <el-tooltip effect="dark" content="刷新" placement="bottom">
       <el-icon class="mr-5" @click="$emit('refresh')"><Refresh /></el-icon>

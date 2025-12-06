@@ -61,7 +61,7 @@
       :title="title"
       v-model="visible"
       ref="formDrawerRef"
-      @submit="onSubmit"
+      @submit="submit"
     >
       <el-form
         :model="form"
@@ -70,9 +70,9 @@
         label-width="80px"
         :inline="false"
       >
-        <el-form-item label="上级菜单" prop="rule_id">
+        <el-form-item label="上级菜单" prop="ruleId">
           <el-cascader
-            v-model="form.rule_id"
+            v-model="form.ruleId"
             :options="rulesData"
             clearable
             :props="{
@@ -104,7 +104,7 @@
         <el-form-item
           label="前端路由"
           prop="frontpath"
-          v-if="form.menu == 1 && form.rule_id > 0"
+          v-if="form.menu == 1 && form.ruleId > 0"
         >
           <el-input v-model="form.frontpath" placeholder="前端路由"></el-input>
         </el-form-item>
@@ -153,19 +153,19 @@ const loading = ref(false);
 const {
   visible,
   title,
-  mode,
   openAdd,
   openEdit,
   form,
   rules,
   formDrawerRef,
   formRef,
-} = useFormDrawer<IRuleItem>(
+  submit,
+} = useFormDrawer(
   {
-    rule_id: [{ required: true, message: "请选择上级菜单" }],
+    ruleId: [{ required: true, message: "请选择上级菜单" }],
   },
   {
-    rule_id: 0,
+    ruleId: 0,
     menu: 0,
     name: "",
     condition: "",
@@ -174,7 +174,12 @@ const {
     order: 50,
     icon: "",
     frontpath: "",
-  }
+  },
+  {
+    createApi: createRule,
+    updateApi: updateRule,
+  },
+  () => getRuleData()
 );
 
 const getRuleData = async () => {
@@ -189,33 +194,38 @@ const getRuleData = async () => {
 };
 getRuleData();
 
-const onSubmit = async () => {
-  await formRef.value?.validate();
+// const onSubmit = async () => {
+//   await formRef.value?.validate();
 
-  if (mode.value === "add") {
-    await createRule(form);
-    toast("操作成功");
-  } else if (mode.value === "edit") {
-    console.log(form);
-    await updateRule(form);
-    toast("操作成功");
-  }
-};
+//   if (mode.value === "add") {
+//     await createRule(form);
+//     toast("操作成功");
+//   } else if (mode.value === "edit") {
+//     console.log(form);
+//     await updateRule(form);
+//     toast("操作成功");
+//   }
+// };
 
 const handleDelete = async (id: number) => {
+  loading.value = true;
   await deleteRule(id);
-
+  getRuleData();
   toast("删除成功");
+  loading.value = false;
 };
 
 const addChild = (id: number) => {
   openAdd();
-  form.rule_id = id;
+  form.ruleId = id;
   form.status = 1;
 };
 
 const handleStatusChange = async (status: number, data: IRuleItem) => {
+  loading.value = true;
   await updateRuleStatus(data.id, status);
+  getRuleData();
+  loading.value = false;
   toast("修改成功");
 };
 </script>

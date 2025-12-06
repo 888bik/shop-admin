@@ -21,7 +21,7 @@
     </el-select>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import * as iconList from "@element-plus/icons-vue";
 defineProps({
@@ -31,7 +31,7 @@ defineProps({
 const icons = ref(Object.keys(iconList));
 
 const emit = defineEmits(["update:modelValue"]);
-const handleChange = (icon) => {
+const handleChange = (icon: any) => {
   emit("update:modelValue", icon);
 };
 </script>

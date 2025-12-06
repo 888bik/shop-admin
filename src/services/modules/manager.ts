@@ -38,7 +38,6 @@ export const getManagerList = (page = 1, limit = 10, keyword = "") => {
 export const createManager = (payload: createManagerPayload) => {
   return managerRequest.post("admin/manager", {
     ...payload,
-    role_id: payload.roleId,
   });
 };
 

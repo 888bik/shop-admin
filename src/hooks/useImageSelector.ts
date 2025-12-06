@@ -5,8 +5,8 @@ export function useImageSelector() {
   const imageUrl = ref("");
 
   const openSelector = () => (dialogVisible.value = true);
-  const handleSelect = (url: string) => {
-    imageUrl.value = url;
+  const handleSelect = (data: any) => {
+    imageUrl.value = data.url;
     dialogVisible.value = false;
   };
 

@@ -28,7 +28,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="default" label="规格值" align="center" />
+        <el-table-column prop="defaults" label="规格值" align="center" />
         <el-table-column prop="order" label="排序" align="center" />
         <el-table-column prop="status" label="状态" align="center">
           <template #default="scope">
@@ -104,8 +104,8 @@
           </el-switch>
         </el-form-item>
 
-        <el-form-item label="规则值" prop="default">
-          <TagInput v-model="form.default" />
+        <el-form-item label="规则值" prop="defaults">
+          <TagInput v-model="form.defaults" />
         </el-form-item>
       </el-form>
     </form-drawer>
@@ -132,8 +132,6 @@ const {
   tableLoading,
   currentPage,
   totalCount,
-  query,
-  multiSelectionIds,
   getTableData,
   handleDelete,
   handleChangeStatus,
@@ -160,13 +158,13 @@ const {
 } = useFormDrawer(
   {
     name: [{ required: true, message: "请输入规格名称" }],
-    default: [{ required: true, message: "请添加规格值" }],
+    defaults: [{ required: true, message: "请添加规格值" }],
   },
   {
     name: "",
     order: 50,
     status: 1,
-    default: "",
+    defaults: "",
   },
   {
     createApi: createSkus,
@@ -176,7 +174,7 @@ const {
 );
 
 const init = async () => {
-  getTableData();
+  await getTableData();
 };
 init();
 </script>

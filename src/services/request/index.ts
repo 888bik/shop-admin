@@ -3,6 +3,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import type { MyRequestConfig } from "./type";
 import { toast } from "@/assets/base-ui/toast";
 import { getToken } from "@/utils/auth";
+import camelcaseKeys from "camelcase-keys";
 
 class MyRequest {
   instance: AxiosInstance;
@@ -26,6 +27,10 @@ class MyRequest {
     //响应拦截器
     this.instance.interceptors.response.use(
       (res: AxiosResponse) => {
+        if (res.data) {
+          res.data = camelcaseKeys(res.data, { deep: true });
+        }
+        console.log(res.data);
         return res.data.data;
       },
       (err) => {

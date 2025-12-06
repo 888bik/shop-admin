@@ -2,7 +2,7 @@
   <el-table :data="data" stripe style="width: 100%" v-loading="loading">
     <el-table-column prop="title" label="公告标题" />
     <el-table-column
-      prop="create_time"
+      prop="createTime"
       label="发布时间"
       width="380"
       align="center"

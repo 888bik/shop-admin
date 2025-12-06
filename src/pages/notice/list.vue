@@ -62,6 +62,7 @@ import FormDrawer from "@/components/formDrawer.vue";
 import { type FormInstance, type FormRules } from "element-plus";
 import { toast } from "@/assets/base-ui/toast";
 import ListHeader from "@/components/listHeader.vue";
+import { timeUtils } from "@/utils/date";
 
 const tableData = ref<INoticeItem[]>([]);
 const currentPage = ref(1);
@@ -76,6 +77,7 @@ const form = reactive({
   title: "",
   content: "",
 });
+
 const drawerMode = ref<"add" | "edit" | "delete">("add");
 const drawerTitle = ref("");
 const rules = reactive<FormRules<RuleFormNotice>>({
@@ -87,7 +89,10 @@ const getTableData = async () => {
   try {
     isLoading.value = true;
     const res: INoticeData = await getNoticeList(currentPage.value);
-    tableData.value = res.list;
+    tableData.value = res.list.map((o) => {
+      o.createTime = timeUtils.format(o.createTime);
+      return o;
+    });
     totalCount.value = res.totalCount;
     isLoading.value = false;
   } finally {

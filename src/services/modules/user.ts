@@ -1,9 +1,7 @@
 import { userRequest } from "..";
 
 export const userLogin = (username: string, password: string) => {
-  return userRequest.post("admin/login", "", {
-    params: { username, password },
-  });
+  return userRequest.post("admin/login", { username, password });
 };
 
 export const getUserInfo = () => {
