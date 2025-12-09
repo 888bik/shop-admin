@@ -1,17 +1,17 @@
 <template>
-  <el-main class="relative" v-loading="isLoading">
-    <div class="image-content">
-      <el-row :gutter="10" class="px-2">
+  <el-main class="relative">
+    <div class="image-content" v-loading="isLoading">
+      <el-empty v-if="!ImageListData.length" description="暂无数据" />
+      <el-row :gutter="10" class="px-2" v-else>
         <el-col
           :span="6"
           v-for="(item, index) in ImageListData"
           :key="item.id"
           class="mt-3"
         >
-          <div class="relative group card-wrapper">
-            <!-- 注意：不要使用 .stop，这样 enablePreview 为 true 的时候 el-image 自带预览可工作 -->
+          <div class="relative group card-wrapper h-38">
             <el-image
-              class="card-cover w-full h-38 object-cover cursor-pointer"
+              class="card-cover w-full h-full object-cover cursor-pointer"
               :src="item.url"
               :preview-src-list="!selectable && enablePreview ? [item.url] : []"
               fit="cover"
@@ -37,20 +37,6 @@
                 <el-icon><Delete /></el-icon>
               </el-button>
             </div>
-
-            <!-- 选择标记（勾）-->
-            <!-- <div
-              v-if="selectable"
-              class="select-badge absolute left-2 top-2 opacity-0 group-hover:opacity-100 transition"
-            >
-              <el-icon
-                class="badge-icon"
-                @click.stop="toggleSelect(item)"
-                :title="selectedIds.includes(item.id) ? '取消选择' : '选择'"
-              >
-                <Check />
-              </el-icon>
-            </div> -->
 
             <!-- 选中遮罩（始终显示当已选中） -->
             <div
@@ -119,8 +105,6 @@ const totalCount = ref<number>(0);
 
 // 用来保存当前分类 ID
 const localCategoryId = ref<number | null>(0);
-// 跨分类保存选中状态
-// const selectedMap = ref<Record<number, IImageItem>>({});
 
 // 当前分类选中列表，界面绑定
 const selectedIds = ref<number[]>([...props.initialSelectedIds]);
@@ -131,9 +115,6 @@ const loadImageList = async (id?: number) => {
   if (id != undefined) {
     localCategoryId.value = id; //缓存id
     currentPage.value = 1; //切换分页从第一页开始加载
-
-    // 切换分类时恢复该分类已选
-    // selectedIds.value = selectedMap.value[id] ? [...selectedMap.value[id]] : [];
   }
 
   if (!localCategoryId.value) {
@@ -219,9 +200,6 @@ const onCardClick = (item: IImageItem) => {
     emit("select", item.url);
     return;
   }
-
-  // enablePreview 为 true 且非 selectable：什么也不做（el-image 自带预览）
-  // 允许 el-image 自己处理预览
 };
 
 // 切换选择（用于勾选 icon 或点击卡片时）
@@ -247,23 +225,7 @@ const toggleSelect = (item: IImageItem) => {
         selectedItemsAll.value.splice(removeIndex, 1);
       }
     }
-    // 更新跨分类 Map
-    // selectedMap.value[cid] = [...selectedIds.value];
 
-    // 组装并 emit 选中的图片对象数组
-    // const selectedItems = ImageListData.value.filter((img) =>
-    //   selectedIds.value.includes(img.id)
-    // );
-    // selectedMap.value[cid] = ImageListData.value.filter((img) => {
-    //   return selectedIds.value.includes(img.id);
-    // });
-
-    // emit("select", selectedItems);
-    // return;
-
-    // const selectedItems = ImageListData.value.filter((img) =>
-    //   selectedIds.value.includes(img.id)
-    // );
     emit("select", selectedItemsAll.value);
     return;
   }
@@ -295,6 +257,7 @@ defineExpose({
   left: 0;
   right: 0;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .bottom {
   position: absolute;

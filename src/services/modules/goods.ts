@@ -37,7 +37,7 @@ export interface IGoodsSkusCardValueItem {
 /** sku card（规格组） */
 export interface IGoodsSkusCardItem {
   id: number;
-  goods_id: number;
+  goodsId: number;
   name: string;
   type: number;
   order: number;
@@ -117,7 +117,7 @@ export interface IGoodsListItem {
   stockDisplay: number;
   expressId: number;
   skuType: number;
-  skuValue: ISkuValue | null;
+  skuValue: ISkuValue;
   content: string;
   discount: number;
   createTime: string;
@@ -195,4 +195,8 @@ export const updateGoodsBanners = (id: number, banners: string[]) => {
 
 export const updateGoodsContent = (id: number, content: string) => {
   return goodsRequest.post(`admin/goods/updateContent/${id}`, { content });
+};
+
+export const checkGoods = (id: number, ischeck: number) => {
+  return goodsRequest.post(`admin/goods/${id}/check`, { ischeck });
 };

@@ -108,8 +108,19 @@
         <el-table-column label="审核状态" align="center" width="120">
           <template #default="{ row }">
             <div class="flex flex-col" v-if="row.ischeck == 0">
-              <el-button type="success" size="small" plain>审核通过</el-button>
-              <el-button class="mt-2 !ml-0" type="danger" size="small" plain
+              <el-button
+                type="success"
+                size="small"
+                plain
+                @click="handleCheckGoods(row.id, 1)"
+                >审核通过</el-button
+              >
+              <el-button
+                class="mt-2 !ml-0"
+                type="danger"
+                size="small"
+                plain
+                @click="handleCheckGoods(row.id, 2)"
                 >审核拒绝</el-button
               >
             </div>
@@ -130,12 +141,23 @@
               <el-button type="primary" size="small" text @click="openEdit(row)"
                 >修改</el-button
               >
-              <el-button type="primary" size="small" text>商品规格</el-button>
+              <el-button
+                :type="
+                  (row.skuType == 0 && !row.skuValue) ||
+                  (row.skuType == 1 && !row.goodsSkus.length)
+                    ? 'danger'
+                    : 'primary'
+                "
+                size="small"
+                text
+                @click="handleSetGoodsSkus(row)"
+                >商品规格</el-button
+              >
               <el-button
                 :type="row.goodsBanner.length == 0 ? 'danger' : 'primary'"
                 size="small"
                 text
-                @click="handleSetGoodsBanner(row)"
+                @click="handleSetGoodsBanner(row.id)"
                 >设置轮播图</el-button
               >
               <el-button
@@ -260,6 +282,7 @@
 
     <Banner ref="bannerRef" @reload-data="getTableData" />
     <Content ref="contentRef" @reload-data="getTableData" />
+    <Skus ref="skusRef" @reload-data="getTableData" />
   </div>
 </template>
 
@@ -271,6 +294,7 @@ import SearchInput from "@/components/searchInput.vue";
 import FormDrawer from "@/components/formDrawer.vue";
 import { useTable } from "@/hooks/useTable";
 import {
+  checkGoods,
   createGoods,
   deleteGoods,
   getGoodsList,
@@ -280,9 +304,10 @@ import {
 } from "@/services/modules/goods";
 import { toast } from "@/assets/base-ui/toast";
 import ImageSelect from "@/components/imageSelect.vue";
-import Banner from "./banners.vue";
-import Content from "./content.vue";
+import Banner from "./cpns/banners.vue";
+import Content from "./cpns/content.vue";
 import { timeUtils } from "@/utils/date";
+import Skus from "./cpns/skus.vue";
 
 const searchQuery = reactive({
   tab: "all",
@@ -294,6 +319,7 @@ const categoryList = ref<IGoodsCategory[]>([]);
 
 const bannerRef = ref();
 const contentRef = ref();
+const skusRef = ref();
 
 const {
   tableData,
@@ -390,12 +416,24 @@ const handleMultiStatusChange = async (status: number) => {
   getTableData();
 };
 
-const handleSetGoodsBanner = (row: any) => {
-  bannerRef.value.open(row.id);
+const handleSetGoodsBanner = (id: number) => {
+  bannerRef.value.open(id);
 };
 
 const handleGoodsDetail = (id: number) => {
   contentRef.value?.open(id);
+};
+
+const handleCheckGoods = async (id: number, ischeck: number) => {
+  await checkGoods(id, ischeck);
+
+  toast(ischeck === 1 ? "审核通过" : "审核拒绝");
+
+  getTableData();
+};
+
+const handleSetGoodsSkus = (row: any) => {
+  skusRef.value?.open(row);
 };
 
 const tabBarData = [
@@ -433,8 +471,5 @@ const tabBarData = [
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
   margin: 0 !important;
-}
-.avatar-picker {
-  @apply w-[100px] h-[100px] rounded border flex justify-center items-center cursor-pointer hover:(bg-gray-100);
 }
 </style>

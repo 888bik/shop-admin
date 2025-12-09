@@ -5,14 +5,19 @@
       <template v-if="multiple && Array.isArray(selected) && selected.length">
         <div class="thumbs">
           <el-image
-            v-for="(url, i) in selectedUrls"
+            v-for="(url, i) in selectedUrls.slice(0, 5)"
             :key="i"
             :src="url"
             fit="cover"
-            class="thumb"
+            class="thumb !w-[100px] !h-[100px]"
           />
-          <div v-if="selectedUrls.length > 5" class="thumb-more">
+
+          <!-- <div v-if="selectedUrls.length > 5" class="thumb-more">
             +{{ selectedUrls.length - 5 }}
+          </div> -->
+
+          <div class="avatar-picker avatar-picker--small" title="添加图片">
+            <el-icon :size="35"><Plus /></el-icon>
           </div>
         </div>
       </template>
@@ -23,8 +28,8 @@
           <el-image :src="singleUrl" fit="cover" class="single-thumb" />
         </template>
         <template v-else>
-          <div class="avatar-picker">
-            <el-icon :size="25"><Plus /></el-icon>
+          <div class="avatar-picker" title="选择图片">
+            <el-icon :size="35"><Plus /></el-icon>
           </div>
         </template>
       </template>
@@ -35,9 +40,10 @@
       v-model="visible"
       title="选择图片"
       width="80%"
-      top="5vh"
+      top="6vh"
       :close-on-click-modal="false"
       destroy-on-close
+      class="image-picker-dialog"
     >
       <Image-list
         ref="listRef"
@@ -77,38 +83,16 @@ const {
   initialSelectedIds = [],
 } = defineProps<IProps>();
 
-// props
-// const props = defineProps({
-//   // 已选图片（外部绑定）
-//   modelValue: { type: [String, Array, Object, null] as any, default: null },
-//   // 控制弹窗显示（独立于 modelValue）
-//   visible: { type: Boolean, default: false },
-
-//   multiple: { type: Boolean, default: false },
-//   limit: { type: Number, default: 9 },
-//   showTrigger: { type: Boolean, default: true },
-//   categoryId: { type: Number, default: 0 },
-//   initialSelectedIds: { type: Array as () => number[], default: () => [] },
-//   title: { type: String, default: "选择图片" },
-// });
-
 const emit = defineEmits(["update:modelValue", "confirm"]);
 
-const visible = ref<boolean>();
+const visible = ref<boolean>(false);
 
-// watch(localVisible, (v) => emit("update:visible", v));
-
-// internal selected（存储已选内容）
-// - multiple => array of objects or strings
-// - single => object or string or null
 const selected = ref<any>(multiple ? [] : null);
 
-// 初始化 selected 来自 modelValue
 const normalizeModelToSelected = (mv: any) => {
   if (multiple) {
     if (!mv) return [];
     if (Array.isArray(mv)) return mv;
-    // 如果外部给的是单个值，包成数组
     return [mv];
   } else {
     return mv ?? null;
@@ -116,7 +100,6 @@ const normalizeModelToSelected = (mv: any) => {
 };
 selected.value = normalizeModelToSelected(modelValue);
 
-// 当外部 modelValue 改变时同步内部 selected
 watch(
   () => modelValue,
   (v) => {
@@ -124,7 +107,6 @@ watch(
   }
 );
 
-// 方便渲染：取出 url 字符串（支持 item 为 string 或 {url,...}）
 const selectedUrls = computed<string[]>(() => {
   if (!multiple) return [];
   const arr = Array.isArray(selected.value) ? selected.value : [];
@@ -138,10 +120,7 @@ const singleUrl = computed<string | null>(() => {
   return typeof it === "string" ? it : it?.url || null;
 });
 
-// 当 image-list 选中时（image-list 在选择时会 emit 对象或对象数组）
-// 直接把 payload 存入 selected（父组件上 next 会在确认时接收）
 const onSelect = (payload: any) => {
-  // payload 可能是 object | [] | url-string
   if (multiple) {
     selected.value = Array.isArray(payload)
       ? payload
@@ -151,7 +130,6 @@ const onSelect = (payload: any) => {
   } else {
     selected.value = payload ?? null;
   }
-  // 单选立即确认,返回图片并关闭dialog
   if (!multiple) handleConfirm();
 };
 
@@ -163,9 +141,7 @@ const closeDialog = () => {
   visible.value = false;
 };
 
-// 把 selected 同步到外部 modelValue 并 emit confirm
 const handleConfirm = () => {
-  // 直接把 selected.value 发给外部）
   emit("update:modelValue", selected.value);
   emit("confirm", selected.value);
   visible.value = false;
@@ -179,47 +155,138 @@ defineExpose({
 </script>
 
 <style scoped>
-.avatar-picker {
-  width: 100px;
-  height: 100px;
+:root {
+  --picker-size: 100px;
+  --thumb-size: 60px;
+  --radius: 8px;
+  --border: 1px dashed #e6e6e6;
+  --shadow: 0 6px 18px rgba(31, 41, 55, 0.08);
+  --muted: #8b8b8b;
+  --accent-1: linear-gradient(135deg, #6ee7b7 0%, #3b82f6 100%);
+}
+
+.trigger {
+  display: inline-block;
+}
+
+/* thumbs area: responsive grid */
+.thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  max-width: calc(100px * 3 + 12px * 2);
+}
+
+.thumb {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
   border-radius: 6px;
-  border: 1px dashed #e6e6e6;
+  object-fit: cover;
+  box-shadow: var(--shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+.thumb:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 14px 30px rgba(31, 41, 55, 0.12);
+}
+
+.thumb-more {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.02));
+  color: var(--muted);
+  font-weight: 600;
+  border: 1px dashed rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
+
+/* avatar picker (big) */
+.avatar-picker {
+  height: 100px;
+  width: 100px;
+  border-radius: var(--radius);
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(250, 250, 250, 0.9)
+  );
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.avatar-picker--small {
+  width: 100px;
+  height: 100px;
+  border-radius: 6px;
+}
+
+.avatar-picker:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(31, 41, 55, 0.12);
+  background: var(--accent-1);
+  /* color: white; */
+}
+
+/* .avatar-picker el-icon,
+.avatar-picker svg {
+  transition: transform 240ms ease;
+} */
+
+/* .avatar-picker:hover el-icon,
+.avatar-picker:hover svg {
+  transform: rotate(12deg) scale(1.02);
+} */
+
 .single-thumb {
   width: 100px;
   height: 100px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   object-fit: cover;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
-.thumbs {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.thumb {
-  width: 60px;
-  height: 60px;
-  border-radius: 6px;
-  object-fit: cover;
-}
-.thumb-more {
-  width: 60px;
-  height: 60px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  color: #666;
-}
+
+/* dialog footer */
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
   padding: 12px 0;
+}
+
+/* dialog tweaks */
+.image-picker-dialog .el-dialog__header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.image-picker-dialog .el-dialog__body {
+  padding: 16px 24px;
+}
+
+/* small screens adjustments */
+@media (max-width: 600px) {
+  :root {
+    --picker-size: 84px;
+    --thumb-size: 52px;
+  }
+  .thumbs {
+    max-width: 320px;
+  }
+  .image-picker-dialog {
+    width: 95% !important;
+    top: 3vh !important;
+  }
 }
 </style>

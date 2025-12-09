@@ -55,3 +55,8 @@ export const categoryRequest = new MyRequest({
   baseURL: BASE_URL,
   timeout: TIMEOUT,
 });
+
+export const goodsSkusRequest = new MyRequest({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT,
+});

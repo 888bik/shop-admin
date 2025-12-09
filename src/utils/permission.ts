@@ -42,6 +42,6 @@ router.beforeEach(async (to, from, next: NavigationGuardNext) => {
   next();
 });
 
-router.afterEach((to, from) => {
+router.afterEach(() => {
   hideFullLoading();
 });
