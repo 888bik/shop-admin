@@ -200,3 +200,11 @@ export const updateGoodsContent = (id: number, content: string) => {
 export const checkGoods = (id: number, ischeck: number) => {
   return goodsRequest.post(`admin/goods/${id}/check`, { ischeck });
 };
+
+export const restoreGoods = (ids: number[] | number) => {
+  return goodsRequest.post("admin/goods/restore", { ids });
+};
+
+export const deleteGoodsForce = (ids: number[] | number) => {
+  return goodsRequest.post("admin/goods/delete_force", { ids });
+};

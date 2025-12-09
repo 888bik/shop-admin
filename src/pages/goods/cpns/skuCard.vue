@@ -1,5 +1,5 @@
 <template>
-  <el-form-item label="规格选项" v-loading="">
+  <el-form-item label="规格选项" v-loading="bodyLoading">
     <el-card
       shadow="never"
       class="w-full mb-3"
@@ -17,7 +17,13 @@
               @change="handleUpdate(item)"
             >
               <template #append>
-                <el-icon><more /></el-icon>
+                <el-tooltip effect="dark" content="设置规格">
+                  <el-icon
+                    @click="handleSelectSkus(item)"
+                    class="cursor-pointer"
+                    ><more
+                  /></el-icon>
+                </el-tooltip>
               </template>
             </el-input>
           </div>
@@ -63,6 +69,8 @@
       >添加规格选项</el-button
     >
   </el-form-item>
+
+  <SkusSelect ref="SkusSelectRef" />
 </template>
 
 <script setup lang="ts">
@@ -72,10 +80,25 @@ import {
   handleCreate,
   handleUpdate,
   btnLoading,
+  bodyLoading,
   moveDown,
   moveUp,
+  handleChooseSetGoodsSkusCard,
 } from "@/hooks/useSkus";
 import SkuCardItem from "./skuCardItem.vue";
+import SkusSelect from "@/components/skusSelect.vue";
+import { ref } from "vue";
+
+const SkusSelectRef = ref();
+
+const handleSelectSkus = (item: any) => {
+  SkusSelectRef?.value.open((form: any) => {
+    handleChooseSetGoodsSkusCard(item.id, {
+      name: form.name,
+      value: form.value,
+    });
+  });
+};
 </script>
 
 <style scoped></style>

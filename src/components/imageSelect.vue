@@ -40,7 +40,7 @@
       v-model="visible"
       title="选择图片"
       width="80%"
-      top="6vh"
+      top="5vh"
       :close-on-click-modal="false"
       destroy-on-close
       class="image-picker-dialog"
@@ -238,16 +238,6 @@ defineExpose({
   background: var(--accent-1);
   /* color: white; */
 }
-
-/* .avatar-picker el-icon,
-.avatar-picker svg {
-  transition: transform 240ms ease;
-} */
-
-/* .avatar-picker:hover el-icon,
-.avatar-picker:hover svg {
-  transform: rotate(12deg) scale(1.02);
-} */
 
 .single-thumb {
   width: 100px;

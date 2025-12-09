@@ -12,6 +12,7 @@ import {
   updateGoodsSkusCard,
   updateGoodsSkusCardSort,
   updateGoodsSkusCardValue,
+  updateSkusCardAndValue,
 } from "@/services/modules/goodsSkus";
 import { computed, nextTick, ref } from "vue";
 
@@ -157,11 +158,12 @@ const buildSortData = () => {
     }),
   };
 };
-
+export const bodyLoading = ref(false);
 const syncSort = async () => {
   const data = buildSortData();
 
   try {
+    bodyLoading.value = true;
     await updateGoodsSkusCardSort(data);
 
     getTableData();
@@ -169,7 +171,30 @@ const syncSort = async () => {
     toast("排序已更新");
   } catch (e) {
     toast("排序同步失败");
-    console.error(e);
+  } finally {
+    bodyLoading.value = false;
+  }
+};
+
+export const handleChooseSetGoodsSkusCard = async (id: number, data: any) => {
+  let item = skuCardList.value.find((o) => o.id == id);
+  if (!item) return;
+
+  try {
+    item.loading = true;
+    const res = await updateSkusCardAndValue(id, data);
+    item.name = item.text = res.goodsSkusCard.name;
+    item.goodsSkusCardValue = res.goodsSkusCardValue.map((o: any) => {
+      o.text = o.value || "属性值";
+      return o;
+    });
+    getTableData();
+    toast("更新成功");
+  } catch (error) {
+    toast("更新失败", "", "error");
+    console.log(error);
+  } finally {
+    item.loading = false;
   }
 };
 

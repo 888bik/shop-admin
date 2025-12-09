@@ -28,27 +28,46 @@
           </el-option>
         </el-select>
       </SearchInput>
-      <ListHeader
-        @refresh="getTableData"
-        @add="openAdd"
-        :layout="['delete']"
-        @delete="handleDelete"
-      >
+      <ListHeader @refresh="getTableData" @add="openAdd">
+        <el-button
+          size="small"
+          type="danger"
+          @click="handleDelete(multiSelectionIds)"
+          v-if="searchQuery.tab != 'delete'"
+          >批量删除</el-button
+        >
+        <el-button
+          type="warning"
+          size="small"
+          @click="handleRestoreGoods"
+          v-else
+          >恢复商品</el-button
+        >
         <el-button
           size="small"
           @click="handleMultiStatusChange(1)"
           v-if="searchQuery.tab == 'all' || searchQuery.tab == 'off'"
+          :disabled="!multiSelectionIds.length"
           >上架</el-button
         >
         <el-button
           size="small"
           @click="handleMultiStatusChange(0)"
           v-if="searchQuery.tab == 'all' || searchQuery.tab == 'saling'"
+          :disabled="!multiSelectionIds.length"
           >下架</el-button
         >
-        <el-button size="small" v-if="searchQuery.tab == 'delete'" type="danger"
-          >彻底删除</el-button
+        <el-popconfirm
+          v-if="searchQuery.tab == 'delete'"
+          title="是否要彻底删除该商品？"
+          confirmButtonText="确认"
+          cancelButtonText="取消"
+          @confirm="handleForceDeleteGoods"
         >
+          <template #reference>
+            <el-button size="small" type="danger">彻底删除</el-button>
+          </template>
+        </el-popconfirm>
       </ListHeader>
 
       <el-table
@@ -61,7 +80,7 @@
         <el-table-column type="selection" width="55" />
         <el-table-column label="商品" width="300">
           <template #default="{ row }">
-            <div class="flex">
+            <div class="flex items-center">
               <el-image
                 class="mr-3 rounded"
                 :src="row.cover"
@@ -167,13 +186,16 @@
                 @click="handleGoodsDetail(row.id)"
                 >商品详情</el-button
               >
-              <el-button
-                type="primary"
-                size="small"
-                text
-                @click="handleDelete(row.id)"
-                >删除</el-button
+              <el-popconfirm
+                title="是否要删除该商品？"
+                confirmButtonText="确认"
+                cancelButtonText="取消"
+                @confirm="handleDelete(row.id)"
               >
+                <template #reference>
+                  <el-button size="small" type="primary" text>删除</el-button>
+                </template>
+              </el-popconfirm>
             </span>
             <span v-else>暂无操作</span>
           </template>
@@ -297,7 +319,9 @@ import {
   checkGoods,
   createGoods,
   deleteGoods,
+  deleteGoodsForce,
   getGoodsList,
+  restoreGoods,
   updateGoods,
   updateGoodsStatus,
   type IGoodsCategory,
@@ -411,6 +435,7 @@ const onSearch = (title: string) => {
 };
 
 const handleMultiStatusChange = async (status: number) => {
+  if (!multiSelectionIds.value.length) return;
   await updateGoodsStatus(multiSelectionIds.value, status);
   toast(status == 0 ? "下架成功" : "上架成功");
   getTableData();
@@ -434,6 +459,20 @@ const handleCheckGoods = async (id: number, ischeck: number) => {
 
 const handleSetGoodsSkus = (row: any) => {
   skusRef.value?.open(row);
+};
+
+const handleRestoreGoods = async () => {
+  if (!multiSelectionIds.value.length) return;
+  await restoreGoods(multiSelectionIds.value);
+  toast("操作成功");
+  getTableData();
+};
+
+const handleForceDeleteGoods = async () => {
+  if (!multiSelectionIds.value.length) return;
+  await deleteGoodsForce(multiSelectionIds.value);
+  toast("删除成功");
+  getTableData();
 };
 
 const tabBarData = [

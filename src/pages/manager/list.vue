@@ -256,10 +256,6 @@ watch(
     form.roleId = val;
   }
 );
-
-// watch(currentPage, () => {
-//   getTableData();
-// });
 </script>
 
 <style scoped>

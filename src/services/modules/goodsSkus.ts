@@ -1,5 +1,10 @@
 import { goodsSkusRequest } from "..";
-import type { IGoodsSkuItem, ISkuValue } from "./goods";
+import type {
+  IGoodsSkuItem,
+  IGoodsSkusCardItem,
+  IGoodsSkusCardValueItem,
+  ISkuValue,
+} from "./goods";
 
 export interface UpdateGoodsSkusPayload {
   skuType: number;
@@ -38,13 +43,23 @@ export interface SkusCardValuePayload {
   value: string;
 }
 
-interface CreateSkusCardValuePayload extends SkusCardValuePayload {}
+export interface CreateSkusCardValuePayload extends SkusCardValuePayload {}
 
-interface CreateSkusCardValueResponse extends SkusCardValuePayload {
+export interface CreateSkusCardValueResponse extends SkusCardValuePayload {
   id: number;
 }
 
-interface UpdateSkusCardValuePayload extends SkusCardValuePayload {}
+export interface UpdateSkusCardValuePayload extends SkusCardValuePayload {}
+
+export interface UpdateSKusCardAndValuePayload {
+  name: string;
+  value: string | number[];
+}
+
+export interface UpdateSKusCardAndValueResponse {
+  goodsSkusCard: Omit<IGoodsSkusCardItem, "goodsSkusCardValue">;
+  goodsSkusCardValue: IGoodsSkusCardValueItem[];
+}
 
 /**
  * 统一更新商品单规格和多规格的值
@@ -134,4 +149,16 @@ export const updateGoodsSkusCardValue = (
   return goodsSkusRequest.post(`admin/goods_skus_card/${id}/updateValue`, {
     ...payload,
   });
+};
+
+export const updateSkusCardAndValue = (
+  id: number,
+  payload: UpdateSKusCardAndValuePayload
+) => {
+  return goodsSkusRequest.post<UpdateSKusCardAndValueResponse>(
+    `admin/goods_skus_card/${id}/set`,
+    {
+      ...payload,
+    }
+  );
 };
