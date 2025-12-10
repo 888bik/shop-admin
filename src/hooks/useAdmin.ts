@@ -36,9 +36,11 @@ export function UseEdPassword() {
       if (!valid) return;
 
       updatePassword(form.oldPassword, form.newPassword, form.rePassword);
-      // toast("密码修改成功", "请重新登录", "success");
+      toast("密码修改成功", "请重新登录");
     } catch (error) {
-      console.log("error", error);
+      toast("密码修改失败,请重新尝试", "", "error");
+    } finally {
+      showDrawer.value = false;
     }
   };
 

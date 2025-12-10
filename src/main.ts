@@ -12,6 +12,15 @@ import "@/utils/permission";
 import "nprogress/nprogress.css";
 import "@/utils/route.utils";
 
+if (!(String.prototype as any).replaceAll) {
+  (String.prototype as any).replaceAll = function (
+    search: string,
+    replacement: string
+  ) {
+    return this.split(search).join(replacement);
+  };
+}
+
 const app = createApp(App);
 
 import permission from "./directives/permission";

@@ -30,7 +30,6 @@ class MyRequest {
         if (res.data) {
           res.data = camelcaseKeys(res.data, { deep: true });
         }
-        console.log(res.data);
         return res.data.data;
       },
       (err) => {

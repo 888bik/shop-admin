@@ -38,7 +38,8 @@
       </span>
       <el-dropdown class="dropdown" @command="handleCommand">
         <span class="dropdown flex items-center mx-6 text-light-50">
-          <el-avatar class="mr-2" :size="25" />
+          <el-avatar class="mr-2" :size="25" :src="userStore.user?.avatar" />
+          {{ userStore.user?.username }}
           <el-icon class="el-icon--right">
             <arrow-down />
           </el-icon>

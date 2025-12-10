@@ -41,6 +41,12 @@ export const createManager = (payload: createManagerPayload) => {
   });
 };
 
+/**
+ * 更新管理员信息
+ * @param id
+ * @param payload
+ * @returns
+ */
 export const updateManager = (id: number, payload: UpdateManagerPayload) => {
   return managerRequest.post(`admin/manager/${id}`, {
     ...payload,
@@ -48,10 +54,21 @@ export const updateManager = (id: number, payload: UpdateManagerPayload) => {
   });
 };
 
+/**
+ * 删除管理员
+ * @param id
+ * @returns
+ */
 export const deleteManager = (id: number | number[]) => {
   return managerRequest.post(`admin/manager/${id}/delete`);
 };
 
+/**
+ * 更新管理员状态
+ * @param id
+ * @param status
+ * @returns
+ */
 export const updateManagerStatus = (id: number, status: number) => {
   return managerRequest.post(`admin/manager/${id}/update_status`, { status });
 };

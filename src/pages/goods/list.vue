@@ -1,5 +1,5 @@
 <template>
-  <div class="manager-page">
+  <div class="goods-page">
     <el-tabs v-model="searchQuery.tab">
       <el-tab-pane
         v-for="(item, index) in tabBarData"

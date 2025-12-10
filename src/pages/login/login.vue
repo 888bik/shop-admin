@@ -80,42 +80,40 @@ const form = reactive<RuleForm>({
 const rules = reactive<FormRules<RuleForm>>({
   username: [
     { required: true, message: "用户名不能为空", trigger: "blur" },
-    { min: 3, max: 5, message: "长度必须3到5位", trigger: "blur" },
+    { min: 3, max: 9, message: "长度必须3到9位", trigger: "blur" },
   ],
   password: [
     { required: true, message: "密码不能为空", trigger: "blur" },
-    { min: 3, max: 5, message: "长度必须3到5位", trigger: "blur" },
+    { min: 5, max: 13, message: "长度必须5到13位", trigger: "blur" },
   ],
 });
 
 const onSubmit = async () => {
   if (!formRef.value) return;
+
+  // 1. 校验表单（失败直接 return，不进入 loading）
+  const valid = await formRef.value.validate();
+  if (!valid) return;
+
+  isLoading.value = true;
   try {
-    const valid = await formRef.value.validate();
-
-    if (!valid) return;
-
-    isLoading.value = true;
-
     const token = await userLogin(form.username, form.password);
 
-    isLoading.value = false;
-
-    if (token) {
-      //存储token
-      setToken("admin-token", token);
-
-      //提示登录成功
-      toast("登录成功", "欢迎回来");
-
-      //获取管理员信息
-      await userStore.fetchUserInfo();
-
-      //登录成功跳转
-      router.push("/home");
+    if (!token) {
+      toast("登录失败，请检查账号密码", "", "error");
+      return;
     }
-  } catch (error) {
-    console.log("表单校验失败", error);
+
+    //存储token
+    setToken("admin-token", token);
+    //提示登录成功
+    toast("登录成功", "欢迎回来");
+    //获取管理员信息
+    await userStore.fetchUserInfo();
+    //登录成功跳转
+    router.push("/home");
+  } catch (error: any) {
+    toast(error?.message || "登录失败，请重新尝试", "", "error");
   } finally {
     isLoading.value = false;
   }

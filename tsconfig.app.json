@@ -8,11 +8,15 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "target": "ESNext",
+    "lib": ["ES2021", "DOM"],
+
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true

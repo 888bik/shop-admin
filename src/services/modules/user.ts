@@ -8,14 +8,21 @@ export const getUserInfo = () => {
   return userRequest.post("admin/getinfo");
 };
 
+/**
+ * 更新密码
+ * @param oldPassword
+ * @param password
+ * @param rePassword
+ * @returns
+ */
 export const updatePassword = (
-  oldpassword: string,
+  oldPassword: string,
   password: string,
-  repassword: string
+  rePassword: string
 ) => {
   return userRequest.post("admin/updatepassword", {
-    oldpassword,
+    oldPassword,
     password,
-    repassword,
+    rePassword,
   });
 };
