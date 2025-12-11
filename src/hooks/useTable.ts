@@ -54,13 +54,9 @@ export function useTable<T = any>(options: {
 
   const handleDelete = async (id?: number | number[]) => {
     if (!deleteApi) return Promise.reject("deleteApi not provided");
-    console.log(id);
     tableLoading.value = true;
     try {
       const target = id ?? multiSelectionIds.value;
-      console.log("222222");
-      console.log(multiSelectionIds.value);
-      console.log(target);
       if (!target || (Array.isArray(target) && target.length === 0)) {
         return Promise.reject("no id to delete");
       }

@@ -24,9 +24,13 @@ export interface CategoryPayload {
 export interface createCategoryPayload extends CategoryPayload {}
 export interface updateCategoryPayload extends CategoryPayload {}
 
-export const getCategoryList = (page: number = 1, limit: number = 10) => {
+export const getCategoryList = (
+  page: number = 1,
+  limit: number = 10,
+  typeCode?: string
+) => {
   return categoryRequest.get<CategoryListResponse>(`admin/category/${page}`, {
-    params: { limit },
+    params: { limit, type: typeCode },
   });
 };
 
@@ -44,4 +48,14 @@ export const updateCategory = (id: number, payload: updateCategoryPayload) => {
 
 export const updateCategoryStatus = (id: number, status: number) => {
   return categoryRequest.post(`admin/category/${id}/update_status`, { status });
+};
+
+export const getCategoryTypeList = () => {
+  return categoryRequest.get("admin/category_type/list/vo");
+};
+
+export const getCategoryListByType = (typeCode: string) => {
+  return categoryRequest.get("admin/category/1", {
+    params: { type: typeCode },
+  });
 };

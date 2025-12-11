@@ -12,6 +12,7 @@ interface GetGoodsListPayload {
   title?: string; //关键词
   categoryId?: number; //分类id
   limit?: number;
+  categoryIds?: number[];
 }
 /** 类别项**/
 export interface ICateItem {
@@ -152,7 +153,9 @@ export interface GoodsPayload {
   minOprice: number;
 }
 
-export interface CreateGoodsPayload extends GoodsPayload {}
+export interface CreateGoodsPayload extends GoodsPayload {
+  categoryIds: number[];
+}
 
 export interface UpdateGoodsPayload extends GoodsPayload {}
 

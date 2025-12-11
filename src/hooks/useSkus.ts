@@ -192,7 +192,6 @@ export const handleChooseSetGoodsSkusCard = async (id: number, data: any) => {
     toast("更新成功");
   } catch (error) {
     toast("更新失败", "", "error");
-    console.log(error);
   } finally {
     item.loading = false;
   }

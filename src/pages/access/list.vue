@@ -194,19 +194,6 @@ const getRuleData = async () => {
 };
 getRuleData();
 
-// const onSubmit = async () => {
-//   await formRef.value?.validate();
-
-//   if (mode.value === "add") {
-//     await createRule(form);
-//     toast("操作成功");
-//   } else if (mode.value === "edit") {
-//     console.log(form);
-//     await updateRule(form);
-//     toast("操作成功");
-//   }
-// };
-
 const handleDelete = async (id: number) => {
   loading.value = true;
   await deleteRule(id);

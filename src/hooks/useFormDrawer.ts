@@ -62,7 +62,6 @@ export function useFormDrawer<T = any>(
   const submit = async () => {
     if (!formRef.value) return;
     await formRef.value.validate();
-    console.log(form);
     formDrawerLoading.value = true;
     try {
       if (mode.value === "add" && apis?.createApi) {
@@ -79,7 +78,7 @@ export function useFormDrawer<T = any>(
       onSuccess && onSuccess();
       close();
     } catch (err) {
-      // console.log(err);
+      toast("操作失败", "", "error");
     } finally {
       formDrawerLoading.value = false;
     }

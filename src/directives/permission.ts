@@ -6,8 +6,6 @@ export default {
       //第一个参数为使用指令的元素
       mounted(el, binding) {
         // hasPermission(binding.value, el);
-        console.log(el);
-        console.log(binding.value);
       },
     });
   },

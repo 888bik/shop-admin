@@ -141,8 +141,6 @@ const handleEdit = (row: any) => {
   form.id = row.id;
   form.title = row.title;
   form.content = row.content;
-
-  console.log(form.content, form.title);
 };
 
 const handleDelete = async (id: number) => {

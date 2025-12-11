@@ -282,7 +282,6 @@ const handleDelete = async (id: number) => {
 };
 
 const handleChangeStatus = async (id: number) => {
-  console.log(id);
   isLoading.value = true;
   await updateCouponStatus(id);
   toast("修改成功");

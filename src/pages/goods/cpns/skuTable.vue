@@ -84,7 +84,6 @@
 import { initSkuTable } from "@/hooks/useSkus";
 
 const { tableLabels, tableHeaders, skuList } = initSkuTable();
-console.log(skuList.value);
 </script>
 <style scoped>
 table {

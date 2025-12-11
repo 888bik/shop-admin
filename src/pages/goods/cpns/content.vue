@@ -41,7 +41,6 @@ const open = async (id: number) => {
 const emit = defineEmits(["reloadData"]);
 
 const submit = async () => {
-  console.log("1111");
   await updateGoodsContent(goodsId.value, form.content);
 
   toast("设置商品详情成功");

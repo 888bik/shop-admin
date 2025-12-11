@@ -15,7 +15,7 @@
         label-name="商品分类"
       >
         <el-select
-          v-model="searchQuery.categoryId"
+          v-model="searchQuery.categoryIds"
           placeholder="请选择商品分类"
           clearable
         >
@@ -237,10 +237,11 @@
           <ImageSelect :multiple="false" v-model="form.cover" />
         </el-form-item>
 
-        <el-form-item label="商品分类" prop="categoryId">
+        <el-form-item label="商品分类" prop="categoryIds">
           <el-select
-            v-model="form.categoryId"
+            v-model="form.categoryIds"
             placeholder="请选择商品分类"
+            multiple
             clearable
           >
             <el-option
@@ -269,12 +270,12 @@
         </el-form-item>
         <el-form-item label="总库存" prop="stock">
           <el-input v-model="form.stock" type="number" style="width: 40%">
-            <template #append>件</template>
+            <template #append>束</template>
           </el-input></el-form-item
         >
         <el-form-item label="库存预警" prop="minStock">
           <el-input v-model="form.minStock" type="number" style="width: 40%">
-            <template #append>件</template>
+            <template #append>束</template>
           </el-input>
         </el-form-item>
         <el-form-item label="最低销售价" prop="minPrice">
@@ -336,7 +337,7 @@ import Skus from "./cpns/skus.vue";
 const searchQuery = reactive({
   tab: "all",
   title: "",
-  categoryId: null,
+  categoryIds: [],
 });
 
 const categoryList = ref<IGoodsCategory[]>([]);
@@ -362,7 +363,7 @@ const {
       tab: query.tab,
       limit,
       title: query.title,
-      categoryId: query.categoryId,
+      categoryIds: query.categoryIds,
     }),
   deleteApi: deleteGoods,
   pageSize: 10,
@@ -383,20 +384,21 @@ const {
   {
     title: [{ required: true, message: "商品名称不能为空" }],
     cover: [{ required: true, message: "请选择封面" }],
-    categoryId: [{ required: true, message: "请选择商品分类" }],
+    categoryIds: [{ required: true, message: "请选择商品分类" }],
   },
   {
     title: null, //商品名称
     categoryId: null, //商品分类
     cover: null, //商品封面
     description: null, //商品描述
-    unit: "件", //商品单位
+    unit: "束", //商品单位
     stock: 100, //总库存
     minStock: 10, //库存预警
     status: 1, //是否上架 0仓库1上架
     stockDisplay: 1, //库存显示 0隐藏1显示
     minPrice: 0, //最低销售价
     minOprice: 0, //最低原价
+    categoryIds: [],
   },
   {
     createApi: createGoods,
@@ -414,17 +416,15 @@ watch(
 );
 
 watch(
-  () => searchQuery.categoryId,
+  () => searchQuery.categoryIds,
   (v) => {
-    console.log(v);
-    query.value.categoryId = v;
+    query.value.categoryIds = v;
     getTableData(1); //切换标签后刷新第一页
   }
 );
 
 const init = async () => {
   const res = await getTableData();
-  console.log(res);
   categoryList.value = res.cates;
 };
 init();
