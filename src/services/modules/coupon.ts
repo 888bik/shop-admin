@@ -3,7 +3,7 @@ import { couponRequest } from "..";
 export interface ICouponItem {
   id: number;
   name: string;
-  order: number;
+  sort: number;
   status: number | string;
   total: number;
   type: number;
@@ -30,7 +30,7 @@ interface CouponPayload {
   minPrice: number;
   startTime: string;
   endTime: string;
-  order: number;
+  sort: number;
   description: string;
 }
 

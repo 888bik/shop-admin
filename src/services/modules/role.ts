@@ -42,7 +42,7 @@ export const createRole = (payload: createRolePayload) => {
 };
 
 export const deleteRole = (id: number) => {
-  return roleRequest.post(`/admin/role/${id}/delete`);
+  return roleRequest.post(`admin/role/${id}/delete`);
 };
 
 export const updateRoleStatus = (id: number, status: number) => {

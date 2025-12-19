@@ -10,24 +10,11 @@
 
     <el-card shadow="never" class="border-0">
       <SearchInput
-        v-model="searchQuery.title"
+        v-model="searchQuery"
+        :fields="searchFields"
         @search="onSearch"
-        label-name="商品分类"
-      >
-        <el-select
-          v-model="searchQuery.categoryIds"
-          placeholder="请选择商品分类"
-          clearable
-        >
-          <el-option
-            v-for="item in categoryList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          >
-          </el-option>
-        </el-select>
-      </SearchInput>
+      />
+
       <ListHeader @refresh="getTableData" @add="openAdd">
         <el-button
           size="small"
@@ -310,7 +297,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import ListHeader from "@/components/listHeader.vue";
 import { useFormDrawer } from "@/hooks/useFormDrawer";
 import SearchInput from "@/components/searchInput.vue";
@@ -339,7 +326,21 @@ const searchQuery = reactive({
   title: "",
   categoryIds: [],
 });
-
+const searchFields = computed(() => [
+  {
+    type: "input" as "input",
+    label: "关键词",
+    model: "title",
+    placeholder: "请输入关键词",
+  },
+  {
+    type: "select" as "select",
+    label: "商品分类",
+    model: "categoryIds",
+    placeholder: "请选择商品分类",
+    options: categoryList.value.map((c) => ({ label: c.name, value: c.id })),
+  },
+]);
 const categoryList = ref<IGoodsCategory[]>([]);
 
 const bannerRef = ref();
@@ -429,8 +430,8 @@ const init = async () => {
 };
 init();
 
-const onSearch = (title: string) => {
-  query.value.title = title;
+const onSearch = (form: { title?: string; categoryIds?: number[] }) => {
+  query.value = { ...query.value, ...form };
   getTableData(1);
 };
 

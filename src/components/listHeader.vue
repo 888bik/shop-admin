@@ -40,7 +40,8 @@ const props = defineProps<ListHeaderProps>();
 
 // 合并（并去重）
 const layout = computed(() => {
-  return Array.from(new Set([...(props.layout ?? []), ...defaultLayout]));
+  // return Array.from(new Set([...(props.layout ?? []), ...defaultLayout]));
+  return props.layout ?? defaultLayout;
 });
 defineEmits<ListHeaderEmits>();
 </script>

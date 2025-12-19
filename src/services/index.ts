@@ -60,3 +60,13 @@ export const goodsSkusRequest = new MyRequest({
   baseURL: BASE_URL,
   timeout: TIMEOUT,
 });
+
+export const ordersRequest = new MyRequest({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT,
+});
+
+export const expressRequest = new MyRequest({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT,
+});
