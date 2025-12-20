@@ -47,9 +47,12 @@ import { ref, reactive, computed } from "vue";
 interface IProps {
   companiesData: ICompaniesItem[];
 }
+interface IEmit {
+  (e: "shipped"): void;
+}
 
 // 父组件传入的公司列表
-const emit = defineEmits();
+const emit = defineEmits<IEmit>();
 const props = defineProps<IProps>();
 
 const dialogVisible = ref(false);

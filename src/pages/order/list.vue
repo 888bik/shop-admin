@@ -90,7 +90,7 @@
 
         <el-table-column label="买家" align="center">
           <template #default="{ row }">
-            <div class="flex items-center">
+            <div class="flex items-center justify-center">
               <el-image
                 :src="row.user.avatar"
                 style="width: 30px; height: 30px"
@@ -104,9 +104,17 @@
 
         <el-table-column label="交易状态" align="center" width="130">
           <template #default="{ row }">
+            <el-tag v-if="row.payStatus === 'refunding'" type="warning">
+              退款中
+            </el-tag>
+
+            <el-tag v-else-if="row.payStatus === 'refunded'" type="info">
+              已退款
+            </el-tag>
+
             <!-- 支付状态 -->
             <el-tag
-              v-if="row.payStatus === 'pending'"
+              v-if="row.payStatus === 'unpaid'"
               type="warning"
               class="mb-1"
               >待支付</el-tag
@@ -125,10 +133,10 @@
               >待发货</el-tag
             >
             <el-tag v-else-if="row.shipStatus === 'shipped'" type="primary"
-              >已发货</el-tag
+              >待收货</el-tag
             >
             <el-tag v-else-if="row.shipStatus === 'received'" type="success"
-              >已完成</el-tag
+              >已收货</el-tag
             >
 
             <!-- 关闭状态 -->
@@ -172,7 +180,11 @@
     </el-card>
 
     <InfoModal ref="InfoModalRef" :detail-info="detailInfo" />
-    <ShipModal ref="ShipModalRef" :companies-data="companiesData" />
+    <ShipModal
+      ref="ShipModalRef"
+      :companies-data="companiesData"
+      @shipped="getTableData"
+    />
   </div>
 </template>
 
@@ -182,7 +194,11 @@ import ListHeader from "@/components/listHeader.vue";
 import SearchInput from "@/components/searchInput.vue";
 import { useTable } from "@/hooks/useTable";
 import { timeUtils } from "@/utils/date";
-import { getOrdersList, type IOrderItem } from "@/services/modules/orders";
+import {
+  deleteOrder,
+  getOrdersList,
+  type IOrderItem,
+} from "@/services/modules/orders";
 import InfoModal from "./cpns/OrderInfoModal.vue";
 import ShipModal from "./cpns/ShipModal.vue";
 import { getCompanies, type ICompaniesItem } from "@/services/modules/express";
@@ -241,6 +257,7 @@ const {
       no: query.no,
       phone: query.phone,
     }),
+  deleteApi: deleteOrder,
   pageSize: 10,
   initialQuery: { tab: "all" },
 });
@@ -256,8 +273,7 @@ watch(
 
 const init = async () => {
   await getTableData();
-  const res = await getCompanies();
-  companiesData.value = res;
+  companiesData.value = await getCompanies();
 };
 init();
 
@@ -272,8 +288,12 @@ const openInfoModal = (row: IOrderItem) => {
 
 const openShipModal = (row: IOrderItem) => {
   ShipModalRef.value?.open(
-    row.orderId,
-    row.extra.shipping,
+    row.id,
+    row.extra.shipping as {
+      type: "standard" | "express";
+      name: string;
+      fee: number;
+    },
     row.payStatus,
     row.shipStatus
   );
@@ -322,16 +342,12 @@ const tabBarData = [
     name: "待发货",
   },
   {
-    key: "shiped",
+    key: "shipped",
     name: "待收货",
   },
   {
     key: "received",
     name: "已收货",
-  },
-  {
-    key: "finish",
-    name: "已完成",
   },
   {
     key: "closed",

@@ -46,7 +46,7 @@ export interface IShipData {
 }
 
 export interface IOrderItem {
-  orderId: number;
+  id: number;
   orderNo: string;
   user: IUser;
   address: IAddress;
@@ -71,7 +71,7 @@ export interface IOrderItem {
 }
 
 export interface OrdersListResponse {
-  list: any;
+  list: IOrderItem[];
   totalCount: number;
 }
 
@@ -118,4 +118,9 @@ export const shipOrder = (
 
 export const getShipData = (id: number) => {
   return ordersRequest.get<ShipDataResponse>(`admin/orders/${id}/ship`);
+};
+
+export const deleteOrder = (ids: number[] | number) => {
+  const arr = Array.isArray(ids) ? ids : [ids];
+  return ordersRequest.post(`admin/orders/delete_all`, { ids: arr });
 };
