@@ -1,28 +1,37 @@
 import { userRequest } from "..";
 
-export const userLogin = (username: string, password: string) => {
-  return userRequest.post("admin/login", { username, password });
-};
+export interface IUserItem {
+  id: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+  phone: string;
+  email: string;
+  status: number;
+  userLevelId: number;
+  userLevelName: string;
+  shareNum: number;
+  shareOrderNum: number;
+  orderPrice: number;
+  commission: number;
+  createTime: string;
+}
 
-export const getUserInfo = () => {
-  return userRequest.post("admin/getinfo");
-};
+export interface UserListResponse {
+  list: IUserItem[];
+  totalCount: number;
+}
 
-/**
- * 更新密码
- * @param oldPassword
- * @param password
- * @param rePassword
- * @returns
- */
-export const updatePassword = (
-  oldPassword: string,
-  password: string,
-  rePassword: string
-) => {
-  return userRequest.post("admin/updatepassword", {
-    oldPassword,
-    password,
-    rePassword,
+export const getUserList = (page: number, limit: number, keyword: string) => {
+  return userRequest.get<UserListResponse>("admin/users/list", {
+    params: { page, limit, keyword },
   });
+};
+
+export const deleteUser = (id: number | number[]) => {
+  return userRequest.delete(`admin/users/${id}`);
+};
+
+export const updateUserStatus = (id: number, status: number) => {
+  return userRequest.post("admin/users/status", { id, status });
 };

@@ -12,7 +12,7 @@
         :data="tableData"
         stripe
         style="width: 100%"
-        v-loading="loading"
+        v-loading="tableLoading"
       >
         <el-table-column label="会员" width="200">
           <template #default="{ row }">
@@ -31,7 +31,7 @@
         </el-table-column>
         <el-table-column label="会员等级" align="center">
           <template #default="{ row }">
-            {{ row.user_level?.name || "-" }}
+            {{ row.userLevelName || "-" }}
           </template>
         </el-table-column>
         <el-table-column label="登录注册" align="center">
@@ -39,7 +39,7 @@
             <p v-if="row.last_login_time">
               最后登录 : {{ row.last_login_time }}
             </p>
-            <p>注册时间 : {{ row.create_time }}</p>
+            <p>注册时间 : {{ timeUtils.format(row.createTime) }}</p>
           </template>
         </el-table-column>
         <el-table-column label="状态" width="100">
@@ -50,7 +50,7 @@
               :inactive-value="0"
               :loading="row.statusLoading"
               :disabled="row.super == 1"
-              @change="handleStatusChange($event, row)"
+              @change="handleChangeStatus(row.id, $event)"
             >
             </el-switch>
           </template>
@@ -61,14 +61,6 @@
               >暂无操作</small
             >
             <div v-else>
-              <el-button
-                type="primary"
-                size="small"
-                text
-                @click="handleEdit(scope.row)"
-                >修改</el-button
-              >
-
               <el-popconfirm
                 title="是否要删除该记录？"
                 confirmButtonText="确认"
@@ -94,80 +86,24 @@
         />
       </div>
     </el-card>
-
-    <form-drawer
-      :title="title"
-      @submit="submit"
-      ref="formDrawerRef"
-      v-model="visible"
-    >
-      <el-form
-        :model="form"
-        ref="formRef"
-        label-width="80px"
-        :inline="false"
-        :rules="rules"
-      >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" placeholder="用户名" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="form.password"
-            type="password"
-            placeholder="密码"
-          />
-        </el-form-item>
-
-        <el-form-item label="状态">
-          <el-switch
-            v-model="form.status"
-            :active-value="1"
-            :inactive-value="0"
-          />
-        </el-form-item>
-      </el-form>
-    </form-drawer>
-
-    <el-dialog
-      v-model="dialogVisible"
-      title="选择图片"
-      width="80%"
-      top="5vh"
-      :close-on-click-modal="false"
-    >
-      <ImageList @select="handleSelect" :enable-preview="false" />
-
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">
-            确认
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from "vue";
-import ImageList from "@/pages/image/list.vue";
 import ListHeader from "@/components/listHeader.vue";
 import { useFormDrawer } from "@/hooks/useFormDrawer";
-import { useImageSelector } from "@/hooks/useImageSelector";
 import SearchInput from "@/components/searchInput.vue";
-import {
-  createManager,
-  deleteManager,
-  getManagerList,
-  updateManager,
-  updateManagerStatus,
-} from "@/services/modules/manager";
+
 import FormDrawer from "@/components/formDrawer.vue";
 import { useTable } from "@/hooks/useTable";
-
-const { dialogVisible, imageUrl, handleSelect } = useImageSelector();
+import {
+  deleteUser,
+  getUserList,
+  updateUserStatus,
+  type IUserItem,
+} from "@/services/modules/user";
+import { timeUtils } from "@/utils/date";
 
 const searchQuery = reactive({
   keyword: "",
@@ -192,12 +128,12 @@ const {
   handleDelete,
   handleChangeStatus,
   handlePageChange,
-} = useTable({
-  listApi: (page, limit, query) => getManagerList(page, limit, query.keyword),
-  deleteApi: deleteManager,
-  updateStatusApi: updateManagerStatus,
+} = useTable<IUserItem>({
+  listApi: (page, limit, query) => getUserList(page, limit, query.keyword),
+  deleteApi: deleteUser,
+  updateStatusApi: updateUserStatus,
   pageSize: 10,
-  initialQuery: {}, // 如果有搜索参数放这里
+  initialQuery: {},
 });
 const {
   visible,
@@ -217,25 +153,16 @@ const {
     avatar: [{ required: true, message: "请选择头像" }],
     role: [{ required: true, message: "请选择角色" }],
   },
+  {},
   {
-    username: "",
-    password: "",
-    avatar: "",
-    role: "",
-    status: 0,
-    roleId: 0,
-  },
-  {
-    createApi: createManager,
-    updateApi: updateManager,
+    // createApi: createManager,
+    // updateApi: updateManager,
   },
   () => getTableData()
 );
 
 const init = async () => {
-  const res = await getTableData();
-
-  roles.value = res.roles ?? [];
+  await getTableData();
 };
 init();
 
@@ -246,19 +173,6 @@ const onSearch = (form: Record<string, any>) => {
   };
   getTableData(1);
 };
-
-watch(imageUrl, (val) => {
-  if (val) {
-    form.avatar = val;
-  }
-});
-
-watch(
-  () => form.role,
-  (val) => {
-    form.roleId = val;
-  }
-);
 </script>
 
 <style scoped>

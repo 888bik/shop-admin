@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import useUserStore from "@/store/modules/user";
+import useUserStore from "@/store/modules/manager";
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 

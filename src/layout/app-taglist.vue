@@ -38,7 +38,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import useUserStore from "@/store/modules/user";
+import useUserStore from "@/store/modules/manager";
 import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router";
 import Cookies from "js-cookie";
 

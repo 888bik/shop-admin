@@ -4,7 +4,7 @@ import type { NavigationGuardNext } from "vue-router";
 import { toast } from "../assets/base-ui/toast";
 import { hideFullLoading, showFullLoading } from "../assets/base-ui/loadingBar";
 import { addDynamicRoutes } from "./route.utils";
-import useUserStore from "@/store/modules/user";
+import useUserStore from "@/store/modules/manager";
 
 router.beforeEach(async (to, from, next: NavigationGuardNext) => {
   showFullLoading();

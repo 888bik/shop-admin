@@ -1,4 +1,4 @@
-import { getUserInfo } from "@/services/modules/user";
+import { getUserInfo } from "@/services/modules/manager";
 import { defineStore } from "pinia";
 import type { IUser, UserState } from "../type";
 

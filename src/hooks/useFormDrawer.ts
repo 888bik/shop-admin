@@ -29,6 +29,7 @@ export function useFormDrawer<T = any>(
     mode.value = "add";
     title.value = drawerTitle;
     editData.value = null;
+    console.log(form);
     resetForm();
     visible.value = true;
   };

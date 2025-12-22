@@ -102,7 +102,7 @@ import { removeToken } from "@/utils/auth";
 import { UseEdPassword } from "@/hooks/useAdmin";
 import FormDrawer from "../components/formDrawer.vue";
 import { useFullscreen } from "@vueuse/core";
-import useUserStore from "@/store/modules/user";
+import useUserStore from "@/store/modules/manager";
 
 const { rules, formRef, showDrawer, onSubmit, form } = UseEdPassword();
 

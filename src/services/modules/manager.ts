@@ -18,6 +18,31 @@ interface ManagerListResponse {
 }
 
 /**
+ * 更新密码
+ * @param oldPassword
+ * @param password
+ * @param rePassword
+ * @returns
+ */
+export const updatePassword = (
+  oldPassword: string,
+  password: string,
+  rePassword: string
+) => {
+  return managerRequest.post("admin/updatepassword", {
+    oldPassword,
+    password,
+    rePassword,
+  });
+};
+export const getUserInfo = () => {
+  return managerRequest.post("admin/getinfo");
+};
+
+export const userLogin = (username: string, password: string) => {
+  return managerRequest.post("admin/login", { username, password });
+};
+/**
  * 获取管理员列表
  * @param page
  * @param limit

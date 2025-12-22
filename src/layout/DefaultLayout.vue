@@ -25,7 +25,7 @@ import AppAside from "@/layout/app-aside.vue";
 import AppHeader from "@/layout/app-header.vue";
 import AppTagList from "@/layout/app-taglist.vue";
 
-import useUserStore from "@/store/modules/user";
+import useUserStore from "@/store/modules/manager";
 
 const userStore = useUserStore();
 </script>
