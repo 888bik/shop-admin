@@ -34,6 +34,10 @@ export interface IExtra {
     name: string;
     fee: number;
   };
+  refund: {
+    applyReason: string;
+    applyTime: number;
+  };
 }
 export interface IShipData {
   shippedTime: number;
@@ -95,6 +99,18 @@ export interface ShipDataResponse {
   trackingNo: string;
 }
 
+export interface RefundPayload {
+  orderId: number;
+  agree: boolean;
+  reason: string;
+  refundType: string;
+}
+
+export interface AgreeReturnPayload {
+  orderId: number;
+  adminId: number;
+}
+
 export const getOrdersList = (
   page: number = 1,
   limit: number = 10,
@@ -123,4 +139,16 @@ export const getShipData = (id: number) => {
 export const deleteOrder = (ids: number[] | number) => {
   const arr = Array.isArray(ids) ? ids : [ids];
   return ordersRequest.post(`admin/orders/delete_all`, { ids: arr });
+};
+
+export const refundOrder = (payload: RefundPayload) => {
+  return ordersRequest.post("admin/orders/refund/handle", { ...payload });
+};
+
+export const agreeReturn = (payload: AgreeReturnPayload) => {
+  return ordersRequest.post("admin/orders/return/agree", { ...payload });
+};
+
+export const confirmReturnRefund = (orderId: number) => {
+  return ordersRequest.post(`admin/orders/refund/confirm`, { orderId });
 };

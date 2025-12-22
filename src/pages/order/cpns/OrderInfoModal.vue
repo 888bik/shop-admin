@@ -34,7 +34,7 @@
             type="primary"
             text
             size="small"
-            @click="openShipInfoModal(detailInfo.orderId)"
+            @click="openShipInfoModal(detailInfo.id)"
             class="ml-3"
             :loading="loading"
             >查看物流</el-button
@@ -96,27 +96,49 @@
         </el-form-item>
         <el-form-item label="收货地址">
           {{
-            detailInfo.address.province +
-            detailInfo.address.city +
-            detailInfo.address.district +
-            detailInfo.address.address
+            [
+              detailInfo.address.province,
+              detailInfo.address.city,
+              detailInfo.address.district,
+              detailInfo.address.address,
+            ]
+              .filter(Boolean)
+              .join("")
           }}
         </el-form-item>
       </el-form>
     </el-card>
 
-    <el-card shadow="never" v-if="detailInfo?.refundStatus != 'pending'">
+    <el-card
+      shadow="never"
+      v-if="
+        ['pending', 'agreed', 'returning', 'returned'].includes(
+          detailInfo?.refundStatus || ''
+        )
+      "
+    >
       <template #header>
         <b class="text-sm">退款信息</b>
         <el-button text disabled style="float: right">{{
-          detailInfo?.refundStatus
+          formatRefundStatus
         }}</el-button>
       </template>
       <el-form label-width="80px">
         <el-form-item label="退款理由">
-          <!-- {{ detailInfo?.extra.refund_reason }} -->
+          {{ detailInfo?.extra.refund.applyReason || "-" }}
         </el-form-item>
       </el-form>
+      <el-form-item label="退款单号" v-if="detailInfo?.refundNo">
+        {{ detailInfo.refundNo }}
+      </el-form-item>
+
+      <el-form-item label="退款时间">
+        {{
+          detailInfo?.extra.refund.applyTime
+            ? timeUtils.format(detailInfo.extra.refund.applyTime)
+            : "-"
+        }}
+      </el-form-item>
     </el-card>
   </el-drawer>
 
@@ -125,7 +147,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { IOrderItem } from "@/services/modules/orders";
-import { formatDate, timeUtils } from "@/utils/date";
+import { timeUtils } from "@/utils/date";
 import ShipInfoModal from "./ShipInfoModal.vue";
 interface IProps {
   detailInfo: IOrderItem | null;
@@ -135,24 +157,28 @@ const { detailInfo } = defineProps<IProps>();
 const ShipInfoModalRef = ref();
 const loading = ref(false);
 const dialogVisible = ref(false);
-// const refund_status = computed(() => {
-//   const opt = {
-//     pending: "未退款",
-//     applied: "已申请，等待审核",
-//     processing: "退款中",
-//     success: "退款成功",
-//     failed: "退款失败",
-//   };
-//   return props.info.refund_status ? opt[props.info.refund_status] : "";
-// });
 
-const open = () => {
-  dialogVisible.value = true;
-};
+const formatRefundStatus = computed(() => {
+  const map: Record<string, string> = {
+    none: "未退款",
+    pending: "已申请，等待审核",
+    agreed: "已同意，等待退货",
+    returning: "用户已寄回",
+    returned: "已退货",
+    rejected: "已拒绝",
+    completed: "退款完成",
+  };
+  const code = detailInfo?.refundStatus ?? "none";
+  return map[code] ?? code;
+});
 
 const openShipInfoModal = (id: number) => {
   loading.value = true;
   ShipInfoModalRef.value.open(id).finally(() => (loading.value = false));
+};
+
+const open = () => {
+  dialogVisible.value = true;
 };
 
 defineExpose({

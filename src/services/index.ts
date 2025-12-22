@@ -70,3 +70,8 @@ export const expressRequest = new MyRequest({
   baseURL: BASE_URL,
   timeout: TIMEOUT,
 });
+
+export const commentsRequest = new MyRequest({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT,
+});

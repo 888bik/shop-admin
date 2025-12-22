@@ -4,7 +4,7 @@
       <list-header
         @refresh="getTableData"
         @add="openAdd"
-        :layout="['delete']"
+        :layout="['create', 'delete']"
         @delete="handleDelete"
       />
       <el-table

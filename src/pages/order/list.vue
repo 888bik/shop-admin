@@ -33,7 +33,7 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column label="订单信息" width="350">
+        <el-table-column label="订单信息" width="320">
           <template #default="{ row }">
             <div class="order-info">
               <p class="text-sm font-medium mb-1 px-2 py-1 bg-blue-50 rounded">
@@ -53,7 +53,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="订单商品" width="260">
+        <el-table-column label="订单商品" width="240">
           <template #default="{ row }">
             <div
               v-for="item in row.items"
@@ -79,7 +79,7 @@
         <el-table-column
           label="实付金额"
           align="center"
-          width="120"
+          width="110"
           prop="saleCount"
         >
           <template #default="{ row }">
@@ -88,7 +88,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="买家" align="center">
+        <el-table-column label="买家" align="center" width="150">
           <template #default="{ row }">
             <div class="flex items-center justify-center">
               <el-image
@@ -104,13 +104,30 @@
 
         <el-table-column label="交易状态" align="center" width="130">
           <template #default="{ row }">
-            <el-tag v-if="row.payStatus === 'refunding'" type="warning">
-              退款中
-            </el-tag>
+            <el-tag v-if="row.refundStatus === 'pending'" type="warning"
+              >退款申请中</el-tag
+            >
+            <el-tag v-else-if="row.refundStatus === 'agreed'" type="info"
+              >等待退货</el-tag
+            >
+            <el-tag
+              v-else-if="row.refundStatus === 'return_requested'"
+              type="info"
+              >用户已申请退货</el-tag
+            >
 
-            <el-tag v-else-if="row.payStatus === 'refunded'" type="info">
-              已退款
-            </el-tag>
+            <el-tag v-else-if="row.refundStatus === 'returning'" type="info"
+              >用户已寄回</el-tag
+            >
+            <el-tag v-else-if="row.refundStatus === 'returned'" type="info"
+              >已退货</el-tag
+            >
+            <el-tag v-else-if="row.refundStatus === 'completed'" type="success"
+              >已退款</el-tag
+            >
+            <el-tag v-else-if="row.refundStatus === 'rejected'" type="danger"
+              >已拒绝退款</el-tag
+            >
 
             <!-- 支付状态 -->
             <el-tag
@@ -128,23 +145,34 @@
 
             <!-- 发货状态 -->
             <el-tag
-              v-if="row.shipStatus === 'pending' && row.payStatus === 'paid'"
+              v-if="
+                row.refundStatus === 'none' &&
+                row.shipStatus === 'pending ' &&
+                row.payStatus === 'paid'
+              "
               type="info"
               >待发货</el-tag
             >
-            <el-tag v-else-if="row.shipStatus === 'shipped'" type="primary"
+            <el-tag
+              v-else-if="
+                row.refundStatus === 'none' && row.shipStatus === 'shipped'
+              "
+              type="primary"
               >待收货</el-tag
             >
-            <el-tag v-else-if="row.shipStatus === 'received'" type="success"
+            <el-tag
+              v-else-if="
+                row.refundStatus === 'none' && row.shipStatus === 'received'
+              "
+              type="success"
               >已收货</el-tag
             >
 
-            <!-- 关闭状态 -->
             <el-tag v-if="row.closed" type="danger" class="mt-1">已关闭</el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" width="140">
+        <el-table-column label="操作" align="center">
           <template #default="{ row }">
             <el-button
               size="small"
@@ -156,13 +184,61 @@
             </el-button>
 
             <el-button
-              v-if="row.payStatus === 'paid' && row.shipStatus === 'pending'"
+              v-if="
+                row.payStatus === 'paid' &&
+                row.shipStatus === 'pending' &&
+                row.refundStatus !== 'pending'
+              "
               size="small"
               text
               type="success"
               @click="openShipModal(row)"
             >
               发货
+            </el-button>
+
+            <el-button
+              v-if="
+                row.refundStatus === 'pending' && row.shipStatus === 'pending'
+              "
+              size="small"
+              text
+              type="primary"
+              @click="handleRefund(row, true)"
+            >
+              同意退款
+            </el-button>
+
+            <el-button
+              v-if="
+                row.refundStatus === 'pending ' && row.shipStatus === 'pending'
+              "
+              size="small"
+              text
+              type="primary"
+              @click="handleRefund(row, false)"
+            >
+              拒绝退款
+            </el-button>
+
+            <el-button
+              v-if="row.refundStatus === 'return_requested'"
+              size="small"
+              text
+              type="primary"
+              @click="handleRefund(row, true)"
+            >
+              同意用户退货
+            </el-button>
+
+            <el-button
+              v-if="row.refundStatus === 'returning'"
+              size="small"
+              text
+              type="success"
+              @click="confirmReturn(row.id)"
+            >
+              确认退货并退款
             </el-button>
           </template>
         </el-table-column>
@@ -195,13 +271,19 @@ import SearchInput from "@/components/searchInput.vue";
 import { useTable } from "@/hooks/useTable";
 import { timeUtils } from "@/utils/date";
 import {
+  confirmReturnRefund,
   deleteOrder,
   getOrdersList,
+  refundOrder,
   type IOrderItem,
 } from "@/services/modules/orders";
 import InfoModal from "./cpns/OrderInfoModal.vue";
 import ShipModal from "./cpns/ShipModal.vue";
 import { getCompanies, type ICompaniesItem } from "@/services/modules/express";
+import { showModal } from "@/assets/base-ui/showModal";
+import { showPrompt } from "@/assets/base-ui/showPrompt";
+import { toast } from "@/assets/base-ui/toast";
+
 const searchQuery = reactive({
   tab: "all",
   no: "",
@@ -266,7 +348,6 @@ watch(
   () => searchQuery.tab,
   (v) => {
     query.value.tab = v;
-    console.log(query.value.tab);
     getTableData(1); //切换标签后刷新第一页
   }
 );
@@ -283,11 +364,11 @@ const openInfoModal = (row: IOrderItem) => {
   };
   detail.paymentMethodText = formatPaymentMethodText(detail.paymentMethod);
   detailInfo.value = detail;
-  InfoModalRef.value?.open();
+  InfoModalRef.value?.open?.();
 };
 
 const openShipModal = (row: IOrderItem) => {
-  ShipModalRef.value?.open(
+  ShipModalRef.value?.open?.(
     row.id,
     row.extra.shipping as {
       type: "standard" | "express";
@@ -314,6 +395,58 @@ const onSearch = (form: any) => {
     ...cleanQuery,
   };
   getTableData(1);
+};
+
+// 处理退款/退货操作
+const handleRefund = async (row: IOrderItem, agree: boolean) => {
+  // 判断退款类型
+  let refundType: "only_refund" | "return_refund" = "only_refund";
+
+  if (row.refundStatus === "pending" && row.shipStatus === "pending") {
+    // 用户未发货申请退款 → 仅退款
+    refundType = "only_refund";
+  } else if (
+    row.refundStatus === "return_requested" &&
+    row.shipStatus === "received"
+  ) {
+    // 用户已收货申请退货 → 退货退款
+    refundType = "return_refund";
+  } else {
+    return toast("当前订单不支持该操作");
+  }
+
+  const msg = agree
+    ? refundType === "only_refund"
+      ? "是否同意该订单退款？"
+      : "是否同意用户退货申请？"
+    : "请输入拒绝退款/退货的理由";
+
+  try {
+    const { value = "" } = agree ? await showModal(msg) : await showPrompt(msg);
+
+    await refundOrder({
+      orderId: row.id,
+      agree,
+      reason: value,
+      refundType,
+    });
+
+    toast("操作成功");
+    getTableData();
+  } catch (err) {
+    // 用户取消操作
+  }
+};
+
+//确认退货并退款
+const confirmReturn = (orderId: number) => {
+  showModal("确认已收到退货并退款？")
+    .then(async () => {
+      await confirmReturnRefund(orderId);
+      toast("退款完成");
+      getTableData();
+    })
+    .catch(() => {});
 };
 
 const formatPaymentMethodText = (method: string | null) => {
@@ -361,3 +494,16 @@ const tabBarData = [
 </script>
 
 <style scoped></style>
+<!-- | 步骤       | 状态变化                           |
+| -------- | ------------------------------ |
+| 用户申请退款   | refundStatus = `pending`       |
+| 管理员同意    | refundStatus = `agreed`        |
+| 用户填写退货单号 | refundStatus = `returning` |
+| 管理员确认收货  | refundStatus = `completed`     | -->
+
+<!-- | refundStatus | 管理员看到 | 操作      |
+| ------------ | ----- | ------- |
+| pending      | 退款申请中 | 同意 / 拒绝 |
+| agreed       | 等待退货  | 确认收到退货  |
+| completed    | 已退款   | 只读      |
+| rejected     | 已拒绝   | 只读      | -->

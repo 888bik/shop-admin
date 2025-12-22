@@ -1,7 +1,11 @@
 <template>
   <div class="manager-page">
     <el-card shadow="never" class="border-0">
-      <SearchInput v-model="keyword" @search="onSearch" />
+      <SearchInput
+        v-model="searchQuery"
+        @search="onSearch"
+        :fields="searchFields"
+      />
       <ListHeader @refresh="getTableData" @add="openAdd" />
 
       <el-table
@@ -157,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import ImageList from "@/pages/image/list.vue";
 import ListHeader from "@/components/listHeader.vue";
 import type { IManagerItem, IRole } from "./type";
@@ -177,10 +181,18 @@ import { useTable } from "@/hooks/useTable";
 const { dialogVisible, imageUrl, handleSelect } = useImageSelector();
 
 const roles = ref<IRole[]>();
-const keyword = ref("");
-watch(keyword, (v) => {
-  query.value.keyword = v; // 更新 query
+const searchQuery = reactive({
+  keyword: "",
 });
+const searchFields = computed(() => [
+  {
+    type: "input" as "input",
+    label: "用户名",
+    model: "keyword",
+    placeholder: "请输入用户名",
+    prefixIcon: "search",
+  },
+]);
 
 const {
   tableData,
@@ -193,7 +205,7 @@ const {
   handleChangeStatus,
   handlePageChange,
 } = useTable<IManagerItem>({
-  listApi: (page, limit) => getManagerList(page, limit, keyword.value),
+  listApi: (page, limit, query) => getManagerList(page, limit, query.keyword),
   deleteApi: deleteManager,
   updateStatusApi: updateManagerStatus,
   pageSize: 10,
@@ -239,8 +251,11 @@ const init = async () => {
 };
 init();
 
-const onSearch = (kw: string) => {
-  query.value.keyword = kw;
+const onSearch = (form: Record<string, any>) => {
+  query.value = {
+    ...query.value,
+    ...form,
+  };
   getTableData(1);
 };
 
