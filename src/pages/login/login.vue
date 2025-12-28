@@ -97,15 +97,15 @@ const onSubmit = async () => {
 
   isLoading.value = true;
   try {
-    const token = await userLogin(form.username, form.password);
+    const tokens = await userLogin(form.username, form.password);
 
-    if (!token) {
+    if (!tokens) {
       toast("登录失败，请检查账号密码", "", "error");
       return;
     }
 
     //存储token
-    setToken("admin-token", token);
+    setToken("accessToken", tokens.accessToken);
     //提示登录成功
     toast("登录成功", "欢迎回来");
     //获取管理员信息

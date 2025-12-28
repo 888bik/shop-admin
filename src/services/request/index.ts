@@ -15,13 +15,13 @@ class MyRequest {
     this.instance.interceptors.request.use(
       (config) => {
         //将token添加到请求头中
-        const token = getToken("admin-token");
-        if (token) config.headers["token"] = token;
+        const token = getToken("accessToken");
+        if (token) config.headers["accessToken"] = token;
 
         return config;
       },
       (err) => {
-        Promise.reject(err);
+        return Promise.reject(err);
       }
     );
     //响应拦截器

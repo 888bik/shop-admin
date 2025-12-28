@@ -122,7 +122,7 @@ const handleCommand = (e: any) => {
 };
 
 function logout() {
-  removeToken("admin-token");
+  removeToken("accessToken");
   toast("退出登录成功", "", "success");
   router.replace("/login");
 }

@@ -6,7 +6,6 @@ export interface ICategoryListItem {
   name: string;
   order: number;
   status: number;
-  child: [];
   crateTime: string;
   updateTime: string;
 }

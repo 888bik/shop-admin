@@ -10,7 +10,7 @@
       <el-container>
         <image-aside
           ref="imageAsideRef"
-          @change-category="(id) => (categoryId = id)"
+          @change-category="(id:number) => (categoryId = id)"
           @edit-category="openEdit"
         />
 
@@ -110,7 +110,7 @@ const emit = defineEmits(["select"]);
 const windowHeight = window.innerHeight || document.body.clientHeight;
 const h = windowHeight - 64 - 44 - 40;
 
-const token = getToken("admin-token");
+const token = getToken("accessToken");
 
 const uploadImageVisible = ref(false);
 const uploadImageDrawerRef = ref(null);

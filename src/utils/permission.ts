@@ -10,7 +10,7 @@ router.beforeEach(async (to, from, next: NavigationGuardNext) => {
   showFullLoading();
 
   //登录判断逻辑:
-  const token = getToken("admin-token");
+  const token = getToken("accessToken");
   //没有token则强制跳转到登录页
   if (!token && to.path !== "/login") {
     //提示需要先登录

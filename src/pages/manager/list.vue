@@ -103,20 +103,7 @@
           />
         </el-form-item>
         <el-form-item label="头像" prop="avatar">
-          <div @click="dialogVisible = true">
-            <template v-if="form.avatar">
-              <el-image
-                :src="form.avatar"
-                fit="cover"
-                style="width: 100px; height: 100px; border-radius: 4px"
-              />
-            </template>
-            <template v-else>
-              <div class="avatar-picker">
-                <el-icon :size="25" class="text-gray-500"><Plus /></el-icon>
-              </div>
-            </template>
-          </div>
+          <ImageSelect :multiple="false" v-model="form.avatar" />
         </el-form-item>
 
         <el-form-item label="所属角色">
@@ -138,25 +125,6 @@
         </el-form-item>
       </el-form>
     </form-drawer>
-
-    <el-dialog
-      v-model="dialogVisible"
-      title="选择图片"
-      width="80%"
-      top="5vh"
-      :close-on-click-modal="false"
-    >
-      <ImageList @select="handleSelect" :enable-preview="false" />
-
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">
-            确认
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
