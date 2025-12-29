@@ -152,3 +152,10 @@ export const agreeReturn = (payload: AgreeReturnPayload) => {
 export const confirmReturnRefund = (orderId: number) => {
   return ordersRequest.post(`admin/orders/refund/confirm`, { orderId });
 };
+
+export const rejectedReturnRefund = (orderId: number, reason: string = "") => {
+  return ordersRequest.post(`admin/orders/refund/return/reject`, {
+    orderId,
+    reason,
+  });
+};

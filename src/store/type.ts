@@ -31,7 +31,7 @@ export interface IUser {
 }
 
 export interface UserState {
-  user: IUser | null;
+  user: IUser;
   menus: MenuItem[];
   asideWidth: string;
   hasRoutes: boolean;

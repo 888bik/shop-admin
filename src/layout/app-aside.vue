@@ -14,12 +14,12 @@
         <!-- 这里的index是菜单项的唯一标识 -->
         <el-sub-menu
           v-if="item.child && item.child.length > 0"
-          :index="item.name"
+          :index="item.id.toString()"
         >
           <!-- 一级菜单 -->
           <template #title>
             <el-icon>
-              <component :is="item.icon" />
+              <component :is="menuIconMap[item.icon]" />
             </el-icon>
             <span>{{ item.name }}</span>
           </template>
@@ -30,7 +30,7 @@
             :index="item2.frontpath"
           >
             <el-icon>
-              <component :is="item2.icon" />
+              <component :is="menuIconMap[item2.icon]" />
             </el-icon>
             <span>{{ item2.name }}</span>
           </el-menu-item>
@@ -38,9 +38,11 @@
 
         <!-- 只有一级菜单 -->
         <el-menu-item v-else :index="item.frontpath">
-          <el-icon :component="item.icon" />
+          <!-- <el-icon :component="item.icon" /> -->
+          <el-icon>
+            <component :is="menuIconMap[item.icon]"></component>
+          </el-icon>
           <span>{{ item.name }}</span>
-          >
         </el-menu-item>
       </template>
     </el-menu>
@@ -49,6 +51,8 @@
 
 <script setup lang="ts">
 import useUserStore from "@/store/modules/manager";
+import { iconMap } from "@/utils/iconMap";
+import { menuIconMap } from "@/utils/menuIconMap";
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 

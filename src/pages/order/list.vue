@@ -211,7 +211,7 @@
 
             <el-button
               v-if="
-                row.refundStatus === 'pending ' && row.shipStatus === 'pending'
+                row.refundStatus === 'pending' && row.shipStatus === 'pending'
               "
               size="small"
               text
@@ -232,6 +232,16 @@
             </el-button>
 
             <el-button
+              v-if="row.refundStatus === 'return_requested'"
+              size="small"
+              text
+              type="danger"
+              @click="handleRefund(row, false)"
+            >
+              拒绝用户退货
+            </el-button>
+
+            <el-button
               v-if="row.refundStatus === 'returning'"
               size="small"
               text
@@ -239,6 +249,16 @@
               @click="confirmReturn(row.id)"
             >
               确认退货并退款
+            </el-button>
+
+            <el-button
+              v-if="row.refundStatus === 'returning'"
+              size="small"
+              text
+              type="danger"
+              @click="rejectedReturn(row.id)"
+            >
+              拒绝退货退款
             </el-button>
           </template>
         </el-table-column>
@@ -275,6 +295,7 @@ import {
   deleteOrder,
   getOrdersList,
   refundOrder,
+  rejectedReturnRefund,
   type IOrderItem,
 } from "@/services/modules/orders";
 import InfoModal from "./cpns/OrderInfoModal.vue";
@@ -433,9 +454,7 @@ const handleRefund = async (row: IOrderItem, agree: boolean) => {
 
     toast("操作成功");
     getTableData();
-  } catch (err) {
-    // 用户取消操作
-  }
+  } catch (err) {}
 };
 
 //确认退货并退款
@@ -447,6 +466,22 @@ const confirmReturn = (orderId: number) => {
       getTableData();
     })
     .catch(() => {});
+};
+
+const rejectedReturn = async (orderId: number) => {
+  try {
+    // 弹出输入框让管理员填写拒绝理由
+    const { value: reason = "" } = await showPrompt("请输入拒绝退款的理由");
+
+    if (!reason) {
+      return toast("请填写拒绝理由");
+    }
+
+    await rejectedReturnRefund(orderId, reason);
+
+    toast("已拒绝退款");
+    getTableData();
+  } catch {}
 };
 
 const formatPaymentMethodText = (method: string | null) => {

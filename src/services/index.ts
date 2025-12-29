@@ -80,3 +80,8 @@ export const userLevelRequest = new MyRequest({
   baseURL: BASE_URL,
   timeout: TIMEOUT,
 });
+
+export const chatRequest = new MyRequest({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT,
+});
